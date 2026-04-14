@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ],
                   ),
-                  CircleAvatar(backgroundColor: ),
+                  CircleAvatar(backgroundColor: Colors.grey, radius: 20),
                 ],
               ),
             ),
