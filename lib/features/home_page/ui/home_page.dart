@@ -40,10 +40,70 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ],
                   ),
-                  CircleAvatar(backgroundColor: Colors.grey, radius: 20),
+                  CircleAvatar(
+                    backgroundColor: Colors.grey,
+                    radius: 20,
+                    child: IconButton(
+                      icon: Icon(Icons.person, color: Colors.white),
+                      onPressed: () {
+                        // Handle avatar press
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),
+          ),
+          const SizedBox(height: 20), // Memberi sedikit jarak jika diperlukan
+          const Divider(
+            color: Colors.grey,
+            thickness: 1, // Ketebalan garis
+            height: 2, // Tinggi area garis
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                left: 20.0,
+                top: 10.0,
+              ), // Jarak dari kiri agar tidak terlalu mepet
+              child: Text(
+                'Rekomendasi',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+          Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0, top: 10.0),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(15),
+                    topRight: Radius.circular(15),
+                  ),
+                  child: Image.asset(
+                    'assets/img/download.jpg',
+                    width: 250,
+                    height: 150,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(15),
+                  bottomRight: Radius.circular(15),
+                ),
+                child: Container(
+                  
+                ),
+              ),
+            ],
           ),
         ],
       ),
