@@ -1,5 +1,5 @@
-import 'package:banuainsight_project/features/home_page/ui/home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:banuainsight_project/features/login/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,10 +15,9 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const HomePage()
+      home: const SplashScreen(),
     );
   }
 }
-
