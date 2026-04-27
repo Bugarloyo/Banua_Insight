@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "67992803860",
+    "project_id": "banua-insight",
+    "storage_bucket": "banua-insight.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:67992803860:android:6868dccc057c1b96226501",
+        "android_client_info": {
+          "package_name": "com.example.banuainsight_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEwXLc5Q3w38pRoJwAz0GS1y7C4LyIf7U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
