@@ -708,15 +708,18 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.shifting,
-        items: const <BottomNavigationBarItem>[
+        backgroundColor: Colors.white,
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Tambah'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Cari'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add, weight: 600),
+            label: 'Tambah',
+          ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: const Color.fromARGB(255, 51, 96, 33),
-        unselectedItemColor:Color.fromARGB(255, 230, 141, 58), // Warna untuk ikon yang sedang tidak dipilih
+        unselectedItemColor: Colors.amber[800],
+        selectedItemColor: Color.fromARGB(255, 51, 96, 33),
         onTap: _onItemTapped,
       ),
     );
