@@ -79,7 +79,7 @@ class _SplashScreenState extends State<SplashScreen> {
               clipBehavior: Clip
                   .none, // Set Clip.none agar pointer/blob yang membesar tidak kepotong
               children: [
-                // Pointer / Blob animasi skala
+                // Pointer / Lingkaran animasi skala
                 AnimatedScale(
                   scale: blobScale,
                   duration: const Duration(milliseconds: 1200),
@@ -87,22 +87,30 @@ class _SplashScreenState extends State<SplashScreen> {
                   curve: _stage == 1
                       ? Curves.easeOutBack
                       : Curves.easeInOutCubic,
-                  child: CustomPaint(
-                    size: const Size(290, 290),
-                    painter: BlobPainter(),
+                  child: Container(
+                    width: 290,
+                    height: 290,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFE5E5E5), // Warna latar lingkaran
+                      shape: BoxShape
+                          .circle, // Membuatnya menjadi lingkaran sempurna
+                    ),
                   ),
                 ),
                 // Logo Image animasi skala
-                AnimatedScale(
-                  scale: logoScale,
-                  duration: const Duration(milliseconds: 1200),
-                  curve: _stage == 1
-                      ? Curves.easeOutBack
-                      : Curves.easeInOutCubic,
-                  child: Image.asset(
-                    'assets/img/Logo_banua.png',
-                    width: 280, // Ukuran asli saat Stage 1
-                    fit: BoxFit.contain,
+                Hero(
+                  tag: 'logo_image',
+                  child: AnimatedScale(
+                    scale: logoScale,
+                    duration: const Duration(milliseconds: 1200),
+                    curve: _stage == 1
+                        ? Curves.easeOutBack
+                        : Curves.easeInOutCubic,
+                    child: Image.asset(
+                      'assets/img/Logo_banua.png',
+                      width: 280, // Ukuran asli saat Stage 1
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
               ],
@@ -112,43 +120,49 @@ class _SplashScreenState extends State<SplashScreen> {
             AnimatedContainer(
               duration: const Duration(milliseconds: 1200),
               height: _stage == 2
-                  ? 50
-                  : 24, // Jaraknya kita perlebar saat tahap 2
+                  ? 10
+                  : 20, // Diperkecil agar teks tidak kejauhan dari logo
               curve: Curves.easeInOutCubic,
             ),
 
             // Teks Name (muncul tahap 2) dianimasikan dengan Opacity & Sedikit digeser naik
-            AnimatedOpacity(
-              opacity: textOpacity,
-              duration: const Duration(milliseconds: 1000), // Perlahan muncul
-              child: AnimatedSlide(
-                offset: _stage == 2 ? Offset.zero : const Offset(0, 0.5),
-                duration: const Duration(milliseconds: 1000),
-                curve: Curves.easeOutCubic,
-                child: const Column(
-                  children: [
-                    Text(
-                      "Banua",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize:
-                            36, // Disesuaikan ukuran font saat muncul agar pas dgn logo yg membesar
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 51, 96, 33),
-                        height: 1.1,
+            Hero(
+              tag: 'logo_text',
+              child: AnimatedOpacity(
+                opacity: textOpacity,
+                duration: const Duration(milliseconds: 1000), // Perlahan muncul
+                child: AnimatedSlide(
+                  offset: _stage == 2 ? Offset.zero : const Offset(0, 0.5),
+                  duration: const Duration(milliseconds: 1000),
+                  curve: Curves.easeOutCubic,
+                  child: const Column(
+                    children: [
+                      Text(
+                        "BANUA",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize:
+                              36, // Disesuaikan ukuran font saat muncul agar pas dgn logo yg membesar
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(255, 51, 96, 33),
+                          height: 1.1,
+                          inherit:
+                              false, // Prevent styling issues in Hero transition
+                        ),
                       ),
-                    ),
-                    Text(
-                      "-Insight-",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 230, 141, 58),
-                        height: 1.1,
+                      Text(
+                        "-INSIGHT-",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.normal,
+                          color: Color.fromARGB(255, 230, 141, 58),
+                          height: 1.1,
+                          inherit: false,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -157,49 +171,4 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
   }
-}
-
-// Class untuk menggambar bentuk organik (Blob)
-class BlobPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Sesuaikan warna blob sesuai preferensi kamu (misal: warna abu-abu muda)
-    final paint = Paint()
-      ..color = const Color(0xFFE5E5E5)
-      ..style = PaintingStyle.fill;
-
-    final path = Path();
-    // Menggambar kurva untuk membentuk blob seperti gambar
-    path.moveTo(size.width * 0.2, size.height * 0.15);
-    path.cubicTo(
-      size.width * 0.6,
-      size.height * -0.05,
-      size.width * 1.0,
-      size.height * 0.2,
-      size.width * 0.9,
-      size.height * 0.6,
-    );
-    path.cubicTo(
-      size.width * 0.8,
-      size.height * 1.0,
-      size.width * 0.2,
-      size.height * 1.1,
-      size.width * 0.05,
-      size.height * 0.7,
-    );
-    path.cubicTo(
-      size.width * -0.1,
-      size.height * 0.4,
-      size.width * 0.0,
-      size.height * 0.25,
-      size.width * 0.2,
-      size.height * 0.15,
-    );
-    path.close();
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
