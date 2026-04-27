@@ -12,6 +12,8 @@ class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _formOffset;
+  late Animation<Offset> _logoOffset;
+  late Animation<double> _logoScale;
 
   @override
   void initState() {
@@ -28,6 +30,22 @@ class _LoginPageState extends State<LoginPage>
             curve: const Interval(0.4, 1.0, curve: Curves.easeOutQuart),
           ),
         );
+
+    _logoOffset =
+        Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.0, 0.65, curve: Curves.easeOutCubic),
+          ),
+        );
+
+    _logoScale = Tween<double>(begin: 1.18, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.65, curve: Curves.easeOutCubic),
+      ),
+    );
 
     // Start animation
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -50,21 +68,24 @@ class _LoginPageState extends State<LoginPage>
           // Header / Logo Section
           Align(
             alignment: Alignment.topCenter,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 50.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Hero(
-                    tag: 'logo_image',
-                    child: Image.asset(
-                      'assets/img/Logo_banua.png',
-                      height: 260,
+            child: SlideTransition(
+              position: _logoOffset,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 50.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ScaleTransition(
+                      scale: _logoScale,
+                      child: Hero(
+                        tag: 'logo_image',
+                        child: Image.asset(
+                          'assets/img/Logo_banua.png',
+                          height: 260,
+                        ),
+                      ),
                     ),
-                  ),
-                  Hero(
-                    tag: 'logo_text',
-                    child: Transform.translate(
+                    Transform.translate(
                       offset: const Offset(
                         0,
                         -50,
@@ -95,8 +116,8 @@ class _LoginPageState extends State<LoginPage>
                         ],
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

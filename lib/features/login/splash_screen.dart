@@ -126,43 +126,37 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
 
             // Teks Name (muncul tahap 2) dianimasikan dengan Opacity & Sedikit digeser naik
-            Hero(
-              tag: 'logo_text',
-              child: AnimatedOpacity(
-                opacity: textOpacity,
-                duration: const Duration(milliseconds: 1000), // Perlahan muncul
-                child: AnimatedSlide(
-                  offset: _stage == 2 ? Offset.zero : const Offset(0, 0.5),
-                  duration: const Duration(milliseconds: 1000),
-                  curve: Curves.easeOutCubic,
-                  child: const Column(
-                    children: [
-                      Text(
-                        "BANUA",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize:
-                              36, // Disesuaikan ukuran font saat muncul agar pas dgn logo yg membesar
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 51, 96, 33),
-                          height: 1.1,
-                          inherit:
-                              false, // Prevent styling issues in Hero transition
-                        ),
+            AnimatedOpacity(
+              opacity: textOpacity,
+              duration: const Duration(milliseconds: 1000), // Perlahan muncul
+              child: AnimatedSlide(
+                offset: _stage == 2 ? Offset.zero : const Offset(0, 0.5),
+                duration: const Duration(milliseconds: 1000),
+                curve: Curves.easeOutCubic,
+                child: const Column(
+                  children: [
+                    Text(
+                      "BANUA",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize:
+                            36, // Disesuaikan ukuran font saat muncul agar pas dgn logo yg membesar
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 51, 96, 33),
+                        height: 1.1,
                       ),
-                      Text(
-                        "-INSIGHT-",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.normal,
-                          color: Color.fromARGB(255, 230, 141, 58),
-                          height: 1.1,
-                          inherit: false,
-                        ),
+                    ),
+                    Text(
+                      "-INSIGHT-",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.normal,
+                        color: Color.fromARGB(255, 230, 141, 58),
+                        height: 1.1,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
