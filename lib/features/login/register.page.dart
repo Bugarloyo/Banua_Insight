@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:banuainsight_project/features/home_page/ui/home_page.dart';
+import 'package:banuainsight_project/features/login/login_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -31,7 +31,8 @@ class _LoginPageState extends State<LoginPage>
           ),
         );
 
-    _logoOffset = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+    _logoOffset =
+        Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
         .animate(
           CurvedAnimation(
             parent: _controller,
@@ -65,17 +66,12 @@ class _LoginPageState extends State<LoginPage>
       body: Stack(
         children: [
           // Header / Logo Section
-          Center(
-            child: AnimatedBuilder(
-              animation: _logoOffset,
-              builder: (context, child) {
-                return Transform.translate(
-                  offset: Offset(0, _logoOffset.value.dy * 150),
-                  child: child,
-                );
-              },
+          Align(
+            alignment: Alignment.topCenter,
+            child: SlideTransition(
+              position: _logoOffset,
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 500),
+                padding: const EdgeInsets.only(top: 50.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -205,6 +201,30 @@ class _LoginPageState extends State<LoginPage>
                           ),
                         ),
                       ),
+                       const SizedBox(height: 20),
+                      // Password Field
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.grey.shade400),
+                        ),
+                        child: TextField(
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            hintText: 'Konfirmasi Password',
+                            suffixIcon: const Icon(
+                              Icons.visibility_outlined,
+                              color: Colors.black87,
+                            ),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 15,
+                            ),
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 10),
                       // Remember Me
                       Row(
@@ -227,7 +247,7 @@ class _LoginPageState extends State<LoginPage>
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const HomePage(),
+                              builder: (context) => const LoginPage(),
                             ),
                           );
                         },
@@ -240,7 +260,7 @@ class _LoginPageState extends State<LoginPage>
                           elevation: 3,
                         ),
                         child: const Text(
-                          'Masuk',
+                          'Daftar',
                           style: TextStyle(fontSize: 18, color: Colors.white),
                         ),
                       ),
@@ -249,9 +269,16 @@ class _LoginPageState extends State<LoginPage>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text('tidak punya akun? '),
+                          const Text('sudah punya akun? '),
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const LoginPage(),
+                                ),
+                              );
+                            },
                             child: const Text(
                               'klik disini',
                               style: TextStyle(

@@ -1,11 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/news_model.dart';
-import '../models/user_model.dart';
 
 class NewsService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String _newsCollection = 'berita';
-  final String _usersCollection = 'users';
 
   // [Umum] Mengambil semua Berita dalam bentuk Stream (real-time realtime)
   Stream<List<BeritaModel>> getBeritaStream() {
@@ -13,7 +11,16 @@ class NewsService {
         .collection(_newsCollection)
         .orderBy('created_at', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => BeritaModel.fromMap(doc.data(), doc['id_berita'] ?? doc.id.hashCode)).toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map(
+                (doc) => BeritaModel.fromMap(
+                  doc.data(),
+                  doc['id_berita'] ?? doc.id.hashCode,
+                ),
+              )
+              .toList(),
+        );
   }
 
   // [Admin] Menambahkan Berita
@@ -52,8 +59,11 @@ class NewsService {
     String? mapsUrl,
   }) async {
     // Cari dokumen aslinya di Firestore berdasarkan field id_berita
-    QuerySnapshot query = await _firestore.collection(_newsCollection).where('id_berita', isEqualTo: idBerita).get();
-    
+    QuerySnapshot query = await _firestore
+        .collection(_newsCollection)
+        .where('id_berita', isEqualTo: idBerita)
+        .get();
+
     if (query.docs.isNotEmpty) {
       String docId = query.docs.first.id;
 
@@ -65,13 +75,19 @@ class NewsService {
       if (imgUrl != null) updateData['img_url'] = imgUrl;
       if (mapsUrl != null) updateData['maps_url'] = mapsUrl;
 
-      await _firestore.collection(_newsCollection).doc(docId).update(updateData);
+      await _firestore
+          .collection(_newsCollection)
+          .doc(docId)
+          .update(updateData);
     }
   }
 
   // [Admin] Menghapus Berita
   Future<void> deleteBerita(int idBerita) async {
-    QuerySnapshot query = await _firestore.collection(_newsCollection).where('id_berita', isEqualTo: idBerita).get();
+    QuerySnapshot query = await _firestore
+        .collection(_newsCollection)
+        .where('id_berita', isEqualTo: idBerita)
+        .get();
     for (var doc in query.docs) {
       await _firestore.collection(_newsCollection).doc(doc.id).delete();
     }
