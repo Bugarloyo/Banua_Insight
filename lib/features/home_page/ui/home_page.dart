@@ -1,3 +1,4 @@
+import 'package:banuainsight_project/features/news_detail/ui/detail_berita.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -10,10 +11,173 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
+  static const String _sampleImage = 'assets/img/download.jpg';
+  static const String _sampleTitle =
+      'Ini adalah artikel kucing yang jarang di temui oleh orang lain';
+  static const String _sampleDate = 'Senin 30 Maret 2026';
+  static const String _viralTitle =
+      'BANJARBARU - Polda Kalsel gelar razia lagi! Terhitung sejak hari ini, Senin (10/2/2025), Polda Kalimantan Selatan';
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  void _openDetailBerita() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const DetailBerita()),
+    );
+  }
+
+  Widget _buildSectionTitle(String text) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 20.0, top: 10.0),
+        child: Text(
+          text,
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRecommendationCard({required EdgeInsetsGeometry margin}) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding: margin,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(15),
+          onTap: _openDetailBerita,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 10.0),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(15),
+                    topRight: Radius.circular(15),
+                  ),
+                  child: Image.asset(
+                    _sampleImage,
+                    width: 310,
+                    height: 170,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              Container(
+                width: 310,
+                height: 115,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(15),
+                    bottomRight: Radius.circular(15),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withValues(alpha: 0.5),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _sampleTitle,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 10),
+                      Text(_sampleDate, style: TextStyle(fontSize: 10)),
+                      SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Text(
+                            'BANUA',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Color.fromARGB(255, 51, 96, 33),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(width: 2),
+                          Text(
+                            'INSIGHT',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Color.fromARGB(255, 230, 141, 58),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildViralItem({required EdgeInsetsGeometry padding}) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: InkWell(
+        onTap: _openDetailBerita,
+        child: Padding(
+          padding: padding,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset(
+                _sampleImage,
+                width: 100,
+                height: 100,
+                fit: BoxFit.cover,
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+                  child: const Text(
+                    _viralTitle,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -30,7 +194,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Row(
                     children: [
-                      Text(
+                      const Text(
                         "BANUA ",
                         style: TextStyle(
                           fontSize: 24,
@@ -38,7 +202,7 @@ class _HomePageState extends State<HomePage> {
                           color: Color.fromARGB(255, 51, 96, 33),
                         ),
                       ),
-                      Text(
+                      const Text(
                         "INSIGHT",
                         style: TextStyle(
                           fontSize: 24,
@@ -52,7 +216,7 @@ class _HomePageState extends State<HomePage> {
                     backgroundColor: Colors.grey,
                     radius: 20,
                     child: IconButton(
-                      icon: Icon(Icons.person, color: Colors.white),
+                      icon: const Icon(Icons.person, color: Colors.white),
                       onPressed: () {
                         // Handle avatar press
                       },
@@ -61,645 +225,52 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-            const SizedBox(height: 20), // Memberi sedikit jarak jika diperlukan
-            const Divider(
-              color: Colors.grey,
-              thickness: 1, // Ketebalan garis
-              height: 2, // Tinggi area garis
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  left: 20.0,
-                  top: 10.0,
-                ), // Jarak dari kiri agar tidak terlalu mepet
-                child: Text(
-                  'Rekomendasi',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
+            const SizedBox(height: 20),
+            const Divider(color: Colors.grey, thickness: 1, height: 2),
+            _buildSectionTitle('Rekomendasi'),
             SizedBox(
-              height:
-                  310, // sesuaikan dengan total tinggi gambar + container card kamu
+              height: 310,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10.0),
-                            child: ClipRRect(
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(15),
-                                topRight: Radius.circular(15),
-                              ),
-                              child: Image.asset(
-                                'assets/img/download.jpg',
-                                width: 310,
-                                height: 170,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: 310,
-                            height: 115,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: const BorderRadius.only(
-                                bottomLeft: Radius.circular(15),
-                                bottomRight: Radius.circular(15),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withValues(alpha: 0.5),
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 3), // Posisi bayangan
-                                ),
-                              ],
-                            ),
-                            child: const Padding(
-                              padding: EdgeInsets.all(12.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Ini adalah artikel kucing yang jarang di temui oleh orang lain',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                      color: Colors.black,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ), // Memberi jarak antara text atas dan bawah
-                                  Text(
-                                    'Senin 30 Maret 2026', // Tambah text baru di sini
-                                    style: TextStyle(fontSize: 10),
-                                  ),
-                                  SizedBox(height: 10),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'BANUA',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: Color.fromARGB(
-                                            255,
-                                            51,
-                                            96,
-                                            33,
-                                          ),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      SizedBox(width: 2),
-                                      Text(
-                                        'INSIGHT',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: Color.fromARGB(
-                                            255,
-                                            230,
-                                            141,
-                                            58,
-                                          ),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  _buildRecommendationCard(
+                    margin: const EdgeInsets.only(left: 20.0),
                   ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10.0),
-                            child: ClipRRect(
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(15),
-                                topRight: Radius.circular(15),
-                              ),
-                              child: Image.asset(
-                                'assets/img/download.jpg',
-                                width: 310,
-                                height: 170,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: 310,
-                            height: 115,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: const BorderRadius.only(
-                                bottomLeft: Radius.circular(15),
-                                bottomRight: Radius.circular(15),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withValues(alpha: 0.5),
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 3), // Posisi bayangan
-                                ),
-                              ],
-                            ),
-                            child: const Padding(
-                              padding: EdgeInsets.all(12.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Ini adalah artikel kucing yang jarang di temui oleh orang lain',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                      color: Colors.black,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ), // Memberi jarak antara text atas dan bawah
-                                  Text(
-                                    'Senin 30 Maret 2026', // Tambah text baru di sini
-                                    style: TextStyle(fontSize: 10),
-                                  ),
-                                  SizedBox(height: 10),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'BANUA',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: Color.fromARGB(
-                                            255,
-                                            51,
-                                            96,
-                                            33,
-                                          ),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      SizedBox(width: 2),
-                                      Text(
-                                        'INSIGHT',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: Color.fromARGB(
-                                            255,
-                                            230,
-                                            141,
-                                            58,
-                                          ),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  _buildRecommendationCard(
+                    margin: const EdgeInsets.only(left: 20.0),
                   ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10.0),
-                            child: ClipRRect(
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(15),
-                                topRight: Radius.circular(15),
-                              ),
-                              child: Image.asset(
-                                'assets/img/download.jpg',
-                                width: 310,
-                                height: 170,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: 310,
-                            height: 115,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: const BorderRadius.only(
-                                bottomLeft: Radius.circular(15),
-                                bottomRight: Radius.circular(15),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withValues(alpha: 0.5),
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 3), // Posisi bayangan
-                                ),
-                              ],
-                            ),
-                            child: const Padding(
-                              padding: EdgeInsets.all(12.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Ini adalah artikel kucing yang jarang di temui oleh orang lain',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                      color: Colors.black,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ), // Memberi jarak antara text atas dan bawah
-                                  Text(
-                                    'Senin 30 Maret 2026', // Tambah text baru di sini
-                                    style: TextStyle(fontSize: 10),
-                                  ),
-                                  SizedBox(height: 10),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'BANUA',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: Color.fromARGB(
-                                            255,
-                                            51,
-                                            96,
-                                            33,
-                                          ),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      SizedBox(width: 2),
-                                      Text(
-                                        'INSIGHT',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: Color.fromARGB(
-                                            255,
-                                            230,
-                                            141,
-                                            58,
-                                          ),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  _buildRecommendationCard(
+                    margin: const EdgeInsets.only(left: 20.0),
                   ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 20.0, right: 20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10.0),
-                            child: ClipRRect(
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(15),
-                                topRight: Radius.circular(15),
-                              ),
-                              child: Image.asset(
-                                'assets/img/download.jpg',
-                                width: 310,
-                                height: 170,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: 310,
-                            height: 115,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: const BorderRadius.only(
-                                bottomLeft: Radius.circular(15),
-                                bottomRight: Radius.circular(15),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withValues(alpha: 0.5),
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 3), // Posisi bayangan
-                                ),
-                              ],
-                            ),
-                            child: const Padding(
-                              padding: EdgeInsets.all(12.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Ini adalah artikel kucing yang jarang di temui oleh orang lain',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                      color: Colors.black,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ), // Memberi jarak antara text atas dan bawah
-                                  Text(
-                                    'Senin 30 Maret 2026', // Tambah text baru di sini
-                                    style: TextStyle(fontSize: 10),
-                                  ),
-                                  SizedBox(height: 10),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'BANUA',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: Color.fromARGB(
-                                            255,
-                                            51,
-                                            96,
-                                            33,
-                                          ),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      SizedBox(width: 2),
-                                      Text(
-                                        'INSIGHT',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: Color.fromARGB(
-                                            255,
-                                            230,
-                                            141,
-                                            58,
-                                          ),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  _buildRecommendationCard(
+                    margin: const EdgeInsets.only(left: 20.0, right: 20.0),
                   ),
                 ],
               ),
             ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  left: 20.0,
-                  top: 10.0,
-                ), // Jarak dari kiri agar tidak terlalu mepet
-                child: Text(
-                  'Berita Viral',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
+            _buildSectionTitle('Berita Viral'),
             ListView(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               scrollDirection: Axis.vertical,
               children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 20.0, top: 10.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/img/download.jpg',
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              left: 10.0,
-                              right: 10.0,
-                            ),
-                            child: Text(
-                              'BANJARBARU - Polda Kalsel gelar razia lagi! Terhitung sejak hari ini, Senin (10/2/2025), Polda Kalimantan Selatan',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                _buildViralItem(
+                  padding: const EdgeInsets.only(left: 20.0, top: 10.0),
                 ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 20.0, top: 10.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/img/download.jpg',
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              left: 10.0,
-                              right: 10.0,
-                            ),
-                            child: Text(
-                              'BANJARBARU - Polda Kalsel gelar razia lagi! Terhitung sejak hari ini, Senin (10/2/2025), Polda Kalimantan Selatan',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                _buildViralItem(
+                  padding: const EdgeInsets.only(left: 20.0, top: 10.0),
                 ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 20.0, top: 10.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/img/download.jpg',
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              left: 10.0,
-                              right: 10.0,
-                            ),
-                            child: Text(
-                              'BANJARBARU - Polda Kalsel gelar razia lagi! Terhitung sejak hari ini, Senin (10/2/2025), Polda Kalimantan Selatan',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                _buildViralItem(
+                  padding: const EdgeInsets.only(left: 20.0, top: 10.0),
                 ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 20.0, top: 10.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/img/download.jpg',
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              left: 10.0,
-                              right: 10.0,
-                            ),
-                            child: Text(
-                              'BANJARBARU - Polda Kalsel gelar razia lagi! Terhitung sejak hari ini, Senin (10/2/2025), Polda Kalimantan Selatan',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                _buildViralItem(
+                  padding: const EdgeInsets.only(left: 20.0, top: 10.0),
                 ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 20.0,
-                      top: 10.0,
-                      bottom: 20.0,
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/img/download.jpg',
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              left: 10.0,
-                              right: 10.0,
-                            ),
-                            child: Text(
-                              'BANJARBARU - Polda Kalsel gelar razia lagi! Terhitung sejak hari ini, Senin (10/2/2025), Polda Kalimantan Selatan',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                _buildViralItem(
+                  padding: const EdgeInsets.only(
+                    left: 20.0,
+                    top: 10.0,
+                    bottom: 20.0,
                   ),
                 ),
               ],
@@ -709,7 +280,7 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
-        items: <BottomNavigationBarItem>[
+        items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Cari'),
           BottomNavigationBarItem(
@@ -719,7 +290,7 @@ class _HomePageState extends State<HomePage> {
         ],
         currentIndex: _selectedIndex,
         unselectedItemColor: Colors.amber[800],
-        selectedItemColor: Color.fromARGB(255, 51, 96, 33),
+        selectedItemColor: const Color.fromARGB(255, 51, 96, 33),
         onTap: _onItemTapped,
       ),
     );

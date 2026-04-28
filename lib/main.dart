@@ -4,11 +4,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 // import 'package:banuainsight_project/features/news_detail/ui/detail_berita.dart'; // import halaman baru
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -24,7 +22,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       // Kita ubah *home* nya dari SplashScreen menjadi DetailBerita agar langsung muncul saat di-run
-      home: const SplashScreen(), 
+      home: const SplashScreen(),
     );
   }
 }
