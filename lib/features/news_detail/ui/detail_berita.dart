@@ -20,6 +20,12 @@ class _DetailBeritaState extends State<DetailBerita> {
     });
   }
 
+  void _handleMoreAction(String action) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Aksi $action dipilih')));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,7 +90,73 @@ class _DetailBeritaState extends State<DetailBerita> {
                 ),
                 Row(
                   children: [
-                    const Icon(Icons.more_horiz, size: 28, color: Colors.black),
+                    const SizedBox(width: 15),
+                    PopupMenuButton<String>(
+                      padding: EdgeInsets.zero,
+                      color: Colors.white,
+                      elevation: 10,
+                      offset: const Offset(0, 48),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      onSelected: _handleMoreAction,
+                      itemBuilder: (context) => [
+                        const PopupMenuItem<String>(
+                          value: 'edit',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.edit_outlined,
+                                size: 22,
+                                color: Colors.black,
+                              ),
+                              SizedBox(width: 12),
+                              Text(
+                                'Edit',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'hapus',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.delete_outline,
+                                size: 22,
+                                color: Colors.black,
+                              ),
+                              SizedBox(width: 12),
+                              Text(
+                                'Hapus',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Icon(
+                          Icons.more_horiz,
+                          size: 36,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
                     const SizedBox(width: 15),
                     GestureDetector(
                       onTap: () => setState(() => isLiked = !isLiked),
@@ -110,8 +182,8 @@ class _DetailBeritaState extends State<DetailBerita> {
             const SizedBox(height: 15),
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                'assets/img/detail_berita.png', // Replace with your image path
+              child: Image.network(
+                'https://example.com/image.jpg',
                 width: double.infinity,
                 height: 220,
                 fit: BoxFit.cover,
