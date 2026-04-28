@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:banuainsight_project/features/home_page/ui/home_page.dart';
+import 'package:banuainsight_project/features/home_page/ui/home_page_user.dart';
+import 'package:banuainsight_project/features/login/register_page.dart';
+import 'package:banuainsight_project/data/services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,14 +13,31 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
+  // Animation Controllers
   late AnimationController _controller;
   late Animation<Offset> _formOffset;
   late Animation<Offset> _logoOffset;
   late Animation<double> _logoScale;
 
+  // Auth Service
+  final AuthService _authService = AuthService();
+
+  // Text Controllers untuk capture input dari user
+  late TextEditingController _emailController;
+  late TextEditingController _passwordController;
+
+  // Loading state untuk tombol
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
+
+    // Initialize TextEditingControllers
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+
+    // Initialize Animation Controller
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
@@ -54,8 +74,106 @@ class _LoginPageState extends State<LoginPage>
 
   @override
   void dispose() {
+    // Dispose TextEditingControllers untuk avoid memory leak
+    _emailController.dispose();
+    _passwordController.dispose();
+
+    // Dispose Animation Controller
     _controller.dispose();
     super.dispose();
+  }
+
+  /// Fungsi untuk handle proses login dengan validasi
+  /// Validasi yang dilakukan:
+  /// 1. Email dan password harus terisi (required)
+  /// 2. Email harus valid format
+  /// 3. Password minimal 6 karakter
+  Future<void> _handleLogin() async {
+    // Validasi 1: Cek field tidak kosong
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      _showErrorDialog('Error', 'Email dan password harus diisi!');
+      return;
+    }
+
+    // Validasi 2: Cek format email
+    if (!_isValidEmail(_emailController.text)) {
+      _showErrorDialog('Error', 'Format email tidak valid!');
+      return;
+    }
+
+    // Validasi 3: Cek password minimal 6 karakter
+    if (_passwordController.text.length < 6) {
+      _showErrorDialog('Error', 'Password minimal 6 karakter!');
+      return;
+    }
+
+    // Jika semua validasi lolos, lanjut ke proses login
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      // Panggil AuthService untuk login
+      var result = await _authService.login(
+        _emailController.text,
+        _passwordController.text,
+      );
+
+      if (result != null) {
+        // Login berhasil, arahkan berdasarkan role akun.
+        if (!mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => result.role.toLowerCase() == 'admin'
+                ? const HomePage()
+                : const HomePageUser(),
+          ),
+        );
+      } else {
+        // Login gagal
+        if (!mounted) return;
+        _showErrorDialog(
+          'Error',
+          'Email atau password salah. Silakan coba lagi.',
+        );
+      }
+    } catch (e) {
+      // Handle exception saat login
+      if (!mounted) return;
+      _showErrorDialog('Error', 'Terjadi kesalahan: ${e.toString()}');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  /// Helper function untuk validasi email menggunakan regex
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    return emailRegex.hasMatch(email);
+  }
+
+  /// Helper function untuk menampilkan error dialog
+  void _showErrorDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -158,7 +276,7 @@ class _LoginPageState extends State<LoginPage>
                         ),
                       ),
                       const SizedBox(height: 40),
-                      // Username Field
+                      // Email Field
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -166,11 +284,13 @@ class _LoginPageState extends State<LoginPage>
                           border: Border.all(color: Colors.grey.shade400),
                         ),
                         child: TextField(
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
-                            hintText: 'Masukkan Username',
+                            hintText: 'Example@gmail.com',
                             prefixIcon: null,
                             suffixIcon: const Icon(
-                              Icons.person_outline,
+                              Icons.email_outlined,
                               color: Colors.black87,
                             ),
                             border: InputBorder.none,
@@ -190,6 +310,7 @@ class _LoginPageState extends State<LoginPage>
                           border: Border.all(color: Colors.grey.shade400),
                         ),
                         child: TextField(
+                          controller: _passwordController,
                           obscureText: true,
                           decoration: InputDecoration(
                             hintText: 'Masukkan Password',
@@ -223,26 +344,35 @@ class _LoginPageState extends State<LoginPage>
                       const SizedBox(height: 30),
                       // Login Button
                       ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const HomePage(),
-                            ),
-                          );
-                        },
+                        onPressed: _isLoading ? null : _handleLogin,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4C9A35),
+                          backgroundColor: _isLoading
+                              ? Colors.grey
+                              : const Color(0xFF4C9A35),
                           padding: const EdgeInsets.symmetric(vertical: 15),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                           elevation: 3,
                         ),
-                        child: const Text(
-                          'Masuk',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                        ),
+                        child: _isLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text(
+                                'Masuk',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
                       const SizedBox(height: 40),
                       // Sign Up Link
@@ -251,7 +381,14 @@ class _LoginPageState extends State<LoginPage>
                         children: [
                           const Text('tidak punya akun? '),
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const RegisterPage(),
+                                ),
+                              );
+                            },
                             child: const Text(
                               'klik disini',
                               style: TextStyle(
