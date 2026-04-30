@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'edit_berita.dart';
 import 'hapus_berita.dart';
@@ -139,7 +140,7 @@ class _DetailBeritaState extends State<DetailBerita> {
                           child: Row(
                             children: [
                               Icon(
-                                Icons.delete_outline,
+                                CupertinoIcons.delete,
                                 size: 22,
                                 color: Colors.black,
                               ),
@@ -183,7 +184,7 @@ class _DetailBeritaState extends State<DetailBerita> {
                     GestureDetector(
                       onTap: () => setState(() => isSaved = !isSaved),
                       child: Icon(
-                        isSaved ? Icons.bookmark : Icons.bookmark,
+                        isSaved ? CupertinoIcons.bookmark_fill : CupertinoIcons.bookmark,
                         size: 26,
                         color: isSaved ? Colors.orange : Colors.black,
                       ),
