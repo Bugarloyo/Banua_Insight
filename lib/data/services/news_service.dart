@@ -6,6 +6,7 @@ class NewsService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String _newsCollection = 'berita';
   final String _usersCollection = 'users';
+  final String _likesCollection = 'likes';
 
   // [Umum] Mengambil semua Berita dalam bentuk Stream (real-time realtime)
   Stream<List<BeritaModel>> getBeritaStream() {
@@ -35,7 +36,6 @@ class NewsService {
       deskripsi: deskripsi,
       isiKonten: isiKonten,
       imgUrl: imgUrl,
-      likesCount: 0,
       createdAt: Timestamp.now(),
       mapsUrl: mapsUrl,
     );
@@ -75,6 +75,51 @@ class NewsService {
     for (var doc in query.docs) {
       await _firestore.collection(_newsCollection).doc(doc.id).delete();
     }
+  }
+
+  // [User] Fitur Like Berita
+  Future<void> toggleLikeBerita(int idUser, int idBerita) async {
+    // Cari apakah user sudah like berita ini
+    QuerySnapshot likeQuery = await _firestore
+        .collection(_likesCollection)
+        .where('id_user', isEqualTo: idUser)
+        .where('id_berita', isEqualTo: idBerita)
+        .get();
+
+    // Cari dokumen berita untuk update likes_count
+    QuerySnapshot newsQuery = await _firestore
+        .collection(_newsCollection)
+        .where('id_berita', isEqualTo: idBerita)
+        .get();
+
+    if (newsQuery.docs.isEmpty) return;
+    DocumentReference newsDoc = newsQuery.docs.first.reference;
+
+    if (likeQuery.docs.isEmpty) {
+      // Belum like, maka kita tambahkan like
+      await _firestore.collection(_likesCollection).add({
+        'id_user': idUser,
+        'id_berita': idBerita,
+        'created_at': FieldValue.serverTimestamp(),
+      });
+      // Increment likesCount di berita
+      await newsDoc.update({'likes_count': FieldValue.increment(1)});
+    } else {
+      // Sudah like, maka kita hapus like (unlike)
+      await likeQuery.docs.first.reference.delete();
+      // Decrement likesCount di berita
+      await newsDoc.update({'likes_count': FieldValue.increment(-1)});
+    }
+  }
+
+  // [User] Mengecek apakah user sudah like berita tertentu
+  Future<bool> isBeritaLiked(int idUser, int idBerita) async {
+    QuerySnapshot query = await _firestore
+        .collection(_likesCollection)
+        .where('id_user', isEqualTo: idUser)
+        .where('id_berita', isEqualTo: idBerita)
+        .get();
+    return query.docs.isNotEmpty;
   }
 
   // NOTE: Di Model spesifikasi belum ada array 'likedBy' / List.
