@@ -312,7 +312,7 @@ class _RegisterPageState extends State<RegisterPage>
                             prefixIcon: null,
                             suffixIcon: const Icon(
                               Icons.person_outline,
-                              color: Colors.black87,
+                              color: Color.fromARGB(221, 101, 101, 101),
                             ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
@@ -338,7 +338,7 @@ class _RegisterPageState extends State<RegisterPage>
                             prefixIcon: null,
                             suffixIcon: const Icon(
                               Icons.email_outlined,
-                              color: Colors.black87,
+                              color: Color.fromARGB(221, 101, 101, 101),
                             ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
@@ -363,7 +363,7 @@ class _RegisterPageState extends State<RegisterPage>
                             hintText: 'Masukkan Password',
                             suffixIcon: const Icon(
                               Icons.visibility_outlined,
-                              color: Colors.black87,
+                              color: Color.fromARGB(221, 101, 101, 101),
                             ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
@@ -388,7 +388,7 @@ class _RegisterPageState extends State<RegisterPage>
                             hintText: 'Konfirmasi Password',
                             suffixIcon: const Icon(
                               Icons.visibility_outlined,
-                              color: Colors.black87,
+                              color: Color.fromARGB(221, 101, 101, 101),
                             ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
@@ -441,7 +441,7 @@ class _RegisterPageState extends State<RegisterPage>
                           const Text('sudah punya akun? '),
                           GestureDetector(
                             onTap: () {
-                              Navigator.pushReplacement(
+                              Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => const LoginPage(),

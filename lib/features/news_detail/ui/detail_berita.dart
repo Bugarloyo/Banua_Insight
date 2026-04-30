@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'edit_berita.dart';
+import 'hapus_berita.dart';
 
 class DetailBerita extends StatefulWidget {
   const DetailBerita({super.key});
@@ -20,10 +22,21 @@ class _DetailBeritaState extends State<DetailBerita> {
     });
   }
 
-  void _handleMoreAction(String action) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Aksi $action dipilih')));
+  Future<void> _handleMoreAction(String action) async {
+    if (action == 'edit') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const EditBerita()),
+      );
+    } else if (action == 'hapus') {
+      await handleHapusBeritaWithAlert(
+        context,
+        onDelete: () async {
+          // Integrasikan ke NewsService.deleteBerita(idBerita) ketika id berita sudah dinamis.
+          await Future<void>.delayed(const Duration(milliseconds: 550));
+        },
+      );
+    }
   }
 
   @override
