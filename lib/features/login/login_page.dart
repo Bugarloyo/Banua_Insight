@@ -122,6 +122,8 @@ class _LoginPageState extends State<LoginPage>
       if (result != null) {
         // Login berhasil, arahkan berdasarkan role akun.
         if (!mounted) return;
+        await _showLoginSuccessBanner();
+        if (!mounted) return;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -174,6 +176,74 @@ class _LoginPageState extends State<LoginPage>
         ],
       ),
     );
+  }
+
+  /// Helper function untuk menampilkan banner sukses login
+  Future<void> _showLoginSuccessBanner() async {
+    final overlay = Overlay.of(context);
+
+    late OverlayEntry overlayEntry;
+    overlayEntry = OverlayEntry(
+      builder: (context) {
+        return Positioned(
+          left: 20,
+          right: 20,
+          top: 65,
+          child: TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeOutBack,
+            tween: Tween<double>(begin: 0.92, end: 1.0),
+            builder: (context, scale, child) {
+              return Opacity(
+                opacity: 1,
+                child: Transform.scale(scale: scale, child: child),
+              );
+            },
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF4C9A35),
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.18),
+                      blurRadius: 18,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.check_circle, color: Colors.white, size: 22),
+                    SizedBox(width: 10),
+                    Text(
+                      'Berhasil login',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    overlay.insert(overlayEntry);
+    await Future<void>.delayed(const Duration(milliseconds: 1200));
+    if (overlayEntry.mounted) {
+      overlayEntry.remove();
+    }
   }
 
   @override
@@ -291,7 +361,7 @@ class _LoginPageState extends State<LoginPage>
                             prefixIcon: null,
                             suffixIcon: const Icon(
                               Icons.email_outlined,
-                              color: Colors.black87,
+                              color: Color.fromARGB(221, 101, 101, 101),
                             ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
@@ -316,7 +386,7 @@ class _LoginPageState extends State<LoginPage>
                             hintText: 'Masukkan Password',
                             suffixIcon: const Icon(
                               Icons.visibility_outlined,
-                              color: Colors.black87,
+                              color: Color.fromARGB(221, 101, 101, 101),
                             ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
@@ -382,7 +452,7 @@ class _LoginPageState extends State<LoginPage>
                           const Text('tidak punya akun? '),
                           GestureDetector(
                             onTap: () {
-                              Navigator.push(
+                              Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => const RegisterPage(),
