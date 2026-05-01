@@ -6,7 +6,6 @@ class BeritaModel {
   String deskripsi;
   String isiKonten;
   String imgUrl;
-  int likesCount;
   Timestamp createdAt;
   String mapsUrl;
 
@@ -16,7 +15,6 @@ class BeritaModel {
     required this.deskripsi,
     required this.isiKonten,
     required this.imgUrl,
-    required this.likesCount,
     required this.createdAt,
     required this.mapsUrl,
   });
@@ -44,7 +42,6 @@ class BeritaModel {
       deskripsi: map['deskripsi'] ?? '',
       isiKonten: map['isi_konten'] ?? '',
       imgUrl: map['img_url'] ?? '',
-      likesCount: map['likes_count'] ?? 0,
       createdAt: map['created_at'] ?? Timestamp.now(),
       mapsUrl: map['maps_url'] ?? '',
     );
@@ -57,7 +54,6 @@ class BeritaModel {
       'deskripsi': deskripsi,
       'isi_konten': isiKonten,
       'img_url': imgUrl,
-      'likes_count': likesCount,
       'created_at': createdAt,
       'maps_url': mapsUrl,
     };
