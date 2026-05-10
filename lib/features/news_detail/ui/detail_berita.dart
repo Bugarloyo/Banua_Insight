@@ -1,10 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:banuainsight_project/features/add_news/tambah_berita.dart';
+import 'package:banuainsight_project/data/models/news_model.dart';
+import 'package:banuainsight_project/data/services/news_service.dart';
 import 'edit_berita.dart';
 import 'hapus_berita.dart';
 
 class DetailBerita extends StatefulWidget {
-  const DetailBerita({super.key});
+  final BeritaModel berita;
+
+  const DetailBerita({super.key, required this.berita});
 
   @override
   State<DetailBerita> createState() => _DetailBeritaState();
@@ -13,11 +18,27 @@ class DetailBerita extends StatefulWidget {
 class _DetailBeritaState extends State<DetailBerita> {
   bool isLiked = false;
   bool isSaved = false;
+  final NewsService _newsService = NewsService();
 
   // Variabel dan fungsi untuk BottomNavigationBar
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
+    // Index 0: Beranda (kembali ke route pertama)
+    if (index == 0) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      return;
+    }
+
+    // Index 2: Tambah (buka halaman tambah berita)
+    if (index == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const TambahBerita()),
+      );
+      return;
+    }
+
     setState(() {
       _selectedIndex = index;
     });
@@ -27,17 +48,37 @@ class _DetailBeritaState extends State<DetailBerita> {
     if (action == 'edit') {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const EditBerita()),
+        MaterialPageRoute(
+          builder: (context) => EditBerita(berita: widget.berita),
+        ),
       );
     } else if (action == 'hapus') {
       await handleHapusBeritaWithAlert(
         context,
         onDelete: () async {
-          // Integrasikan ke NewsService.deleteBerita(idBerita) ketika id berita sudah dinamis.
-          await Future<void>.delayed(const Duration(milliseconds: 550));
+          await _newsService.deleteBerita(widget.berita.idBerita);
         },
       );
     }
+  }
+
+  String _formatDate(DateTime dateTime) {
+    const months = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
+
+    return '${dateTime.day} ${months[dateTime.month - 1]} ${dateTime.year}';
   }
 
   @override
@@ -75,8 +116,8 @@ class _DetailBeritaState extends State<DetailBerita> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 10),
-            const Text(
-              'Polres Banjarbaru Selidiki Kecelakaan Maut Libatkan Mobil Polisi',
+            Text(
+              widget.berita.judul,
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -88,15 +129,15 @@ class _DetailBeritaState extends State<DetailBerita> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '27 Juli 2025',
+                      _formatDate(widget.berita.createdAt.toDate()),
                       style: TextStyle(fontSize: 12, color: Colors.black87),
                     ),
-                    SizedBox(height: 2),
-                    Text(
+                    const SizedBox(height: 2),
+                    const Text(
                       'di upload oleh admin',
                       style: TextStyle(fontSize: 12, color: Colors.black87),
                     ),
@@ -184,7 +225,9 @@ class _DetailBeritaState extends State<DetailBerita> {
                     GestureDetector(
                       onTap: () => setState(() => isSaved = !isSaved),
                       child: Icon(
-                        isSaved ? CupertinoIcons.bookmark_fill : CupertinoIcons.bookmark,
+                        isSaved
+                            ? CupertinoIcons.bookmark_fill
+                            : CupertinoIcons.bookmark_fill,
                         size: 26,
                         color: isSaved ? Colors.orange : Colors.black,
                       ),
@@ -196,25 +239,33 @@ class _DetailBeritaState extends State<DetailBerita> {
             const SizedBox(height: 15),
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                'https://example.com/image.jpg',
-                width: double.infinity,
-                height: 220,
-                fit: BoxFit.cover,
-              ),
+              child: widget.berita.imgUrl.isEmpty
+                  ? Image.asset(
+                      'assets/img/download.jpg',
+                      width: double.infinity,
+                      height: 220,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.network(
+                      widget.berita.imgUrl,
+                      width: double.infinity,
+                      height: 220,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset(
+                          'assets/img/download.jpg',
+                          width: double.infinity,
+                          height: 220,
+                          fit: BoxFit.cover,
+                        );
+                      },
+                    ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Satuan Lalu Lintas Polres Banjarbaru tengah menyelidiki kecelakaan maut yang terjadi di Jalan Ahmad Yani Kilometer 21, Minggu pagi, 27 Juli 2025.\n\n'
-              'Peristiwa tersebut melibatkan sepeda motor yang dikendarai seorang pelajar dengan mobil operasional milik Dit Samapta Polda Kalimantan Selatan.\n\n'
-              'Korban, Iqbal Risanta, siswa SMKN di Gambut, Kabupaten Banjar, tewas di tempat.\n\n'
-              'Lokasi kecelakaan hanya berjarak sekitar 100 meter dari rumah korban di Gang Permata RT 05 RW 01, Kecamatan Liang Anggang.\n\n'
-              'Kepala Satuan Lalu Lintas Polres Banjarbaru, AKP Embang Pramono, mengatakan pihaknya bersama Direktorat Lalu Lintas Polda Kalsel telah melakukan olah tempat kejadian perkara.\n\n'
-              '"Penyelidikan masih berlangsung. Kami memeriksa pengemudi mobil dinas dan sejumlah saksi di lokasi kejadian," ujar Embang.\n\n'
-              'Dari keterangan keluarga, Iqbal diketahui baru belajar mengendarai motor.\n\n'
-              'Saat kecelakaan, ia tidak mengenakan helm dan belum memiliki Surat Izin Mengemudi (SIM).',
+            Text(
+              widget.berita.isiKonten,
               textAlign: TextAlign.justify,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 height: 1.5,
                 color: Colors.black87,
@@ -227,7 +278,7 @@ class _DetailBeritaState extends State<DetailBerita> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
-        items: <BottomNavigationBarItem>[
+        items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Cari'),
           BottomNavigationBarItem(
@@ -237,7 +288,7 @@ class _DetailBeritaState extends State<DetailBerita> {
         ],
         currentIndex: _selectedIndex,
         unselectedItemColor: Colors.amber[800],
-        selectedItemColor: Color.fromARGB(255, 51, 96, 33),
+        selectedItemColor: const Color.fromARGB(255, 51, 96, 33),
         onTap: _onItemTapped,
       ),
     );

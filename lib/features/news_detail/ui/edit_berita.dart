@@ -1,35 +1,55 @@
+/*
+Commands to test EditBerita behavior:
+
+1. flutter pub get
+2. flutter run
+
+Testing steps:
+- Dari Homepage buka sebuah berita -> tekan menu 'Edit' untuk membuka layar EditBerita.
+- Ubah judul/deskripsi/isi/URL gambar/URL maps lalu tekan 'Simpan Berita'.
+- Jika berhasil, akan tampil SnackBar 'Berita berhasil disimpan' dan layar akan kembali.
+
+Use hot reload when making small changes: press 'r' in the Flutter terminal or use VS Code Hot Reload.
+*/
+
 import 'package:flutter/material.dart';
+import 'package:banuainsight_project/data/models/news_model.dart';
+import 'package:banuainsight_project/data/services/news_service.dart';
 
 class EditBerita extends StatefulWidget {
-  const EditBerita({super.key});
+  final BeritaModel berita;
+
+  const EditBerita({super.key, required this.berita});
 
   @override
   State<EditBerita> createState() => _EditBeritaState();
 }
 
 class _EditBeritaState extends State<EditBerita> {
-  late TextEditingController judulController;
-  late TextEditingController isiController;
-  String imageUrl = 'https://example.com/image.jpg';
+  late final TextEditingController judulController;
+  late final TextEditingController deskripsiController;
+  late final TextEditingController isiController;
+  late final TextEditingController imageUrlController;
+  late final TextEditingController mapsUrlController;
+  final NewsService _newsService = NewsService();
 
   @override
   void initState() {
     super.initState();
-    judulController = TextEditingController(
-      text: 'Polres Banjarbaru Selidiki Kecelakaan Maut Libatkan Mobil Polisi',
-    );
-    isiController = TextEditingController(
-      text:
-          'Satuan Lalu Lintas Polres Banjarbaru tengah menyelidiki kecelakaan maut yang terjadi di Jalan Ahmad Yani Kilometer 21, Minggu pagi, 27 Juli 2025.\n\n'
-          'Peristiwa tersebut melibatkan sepeda motor yang dikendarai seorang pelajar dengan mobil operasional milik Dit Samapta Polda Kalimantan Selatan.\n\n'
-          'Korban, Iqbal Risanta, siswa SMKN di Gambut, Kabupaten Banjar, tewas di tempat.',
-    );
+    judulController = TextEditingController(text: widget.berita.judul);
+    deskripsiController = TextEditingController(text: widget.berita.deskripsi);
+    isiController = TextEditingController(text: widget.berita.isiKonten);
+    imageUrlController = TextEditingController(text: widget.berita.imgUrl);
+    mapsUrlController = TextEditingController(text: widget.berita.mapsUrl);
   }
 
   @override
   void dispose() {
     judulController.dispose();
+    deskripsiController.dispose();
     isiController.dispose();
+    imageUrlController.dispose();
+    mapsUrlController.dispose();
     super.dispose();
   }
 
@@ -39,10 +59,34 @@ class _EditBeritaState extends State<EditBerita> {
     );
   }
 
-  void _handleSimpanBerita() {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Berita berhasil disimpan')));
+  Future<void> _handleSimpanBerita() async {
+    try {
+      await _newsService.editBerita(
+        idBerita: widget.berita.idBerita,
+        judul: judulController.text.trim(),
+        deskripsi: deskripsiController.text.trim(),
+        isiKonten: isiController.text.trim(),
+        imgUrl: imageUrlController.text.trim(),
+        mapsUrl: mapsUrlController.text.trim(),
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Berita berhasil disimpan')));
+      Navigator.pop(context);
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Gagal menyimpan berita: $error')));
+    }
   }
 
   @override
@@ -91,7 +135,7 @@ class _EditBeritaState extends State<EditBerita> {
             const SizedBox(height: 12),
             TextField(
               controller: judulController,
-              maxLines: 3,
+              maxLines: 2,
               decoration: InputDecoration(
                 hintText: 'Masukkan judul berita',
                 filled: true,
@@ -172,7 +216,7 @@ class _EditBeritaState extends State<EditBerita> {
                 height: 220,
                 color: Colors.grey[300],
                 child: Image.network(
-                  imageUrl,
+                  imageUrlController.text,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Center(
@@ -226,7 +270,7 @@ class _EditBeritaState extends State<EditBerita> {
                 icon: const Icon(Icons.check),
                 label: const Text('Simpan Berita'),
                 style: ElevatedButton.styleFrom(
-                   backgroundColor: const Color.fromARGB(255, 76, 175, 80),
+                  backgroundColor: const Color.fromARGB(255, 76, 175, 80),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   shape: RoundedRectangleBorder(
