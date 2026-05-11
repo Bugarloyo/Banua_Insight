@@ -1,4 +1,9 @@
 import 'package:banuainsight_project/features/news_detail/ui/detail_berita.dart';
+import 'package:banuainsight_project/features/add_news/tambah_berita.dart';
+import 'package:banuainsight_project/features/search_news/cari_berita.dart';
+import 'package:banuainsight_project/features/profile/profile.dart';
+import 'package:banuainsight_project/data/models/news_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -18,16 +23,58 @@ class _HomePageState extends State<HomePage> {
   static const String _viralTitle =
       'BANJARBARU - Polda Kalsel gelar razia lagi! Terhitung sejak hari ini, Senin (10/2/2025), Polda Kalimantan Selatan';
 
-  void _onItemTapped(int index) {
+  Future<void> _onItemTapped(int index) async {
+    if (index == 1) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const CariBerita(selectedIndex: 1),
+        ),
+      );
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _selectedIndex = 0;
+      });
+      return;
+    }
+
+    if (index == 2) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const TambahBerita()),
+      );
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _selectedIndex = 0;
+      });
+      return;
+    }
+
     setState(() {
       _selectedIndex = index;
     });
   }
 
   void _openDetailBerita() {
+    final sample = BeritaModel(
+      idBerita: 0,
+      judul: _sampleTitle,
+      deskripsi: 'Deskripsi contoh',
+      isiKonten:
+          'Isi berita contoh. Ini hanya contoh untuk preview halaman detail.',
+      imgUrl: '',
+      likesCount: 0,
+      createdAt: Timestamp.now(),
+      mapsUrl: '',
+    );
+
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const DetailBerita()),
+      MaterialPageRoute(builder: (context) => DetailBerita(berita: sample)),
     );
   }
 
@@ -218,7 +265,12 @@ class _HomePageState extends State<HomePage> {
                     child: IconButton(
                       icon: const Icon(Icons.person, color: Colors.white),
                       onPressed: () {
-                        // Handle avatar press
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const Profile(),
+                          ),
+                        );
                       },
                     ),
                   ),
