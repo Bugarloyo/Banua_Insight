@@ -65,7 +65,6 @@ class _TambahBeritaState extends State<TambahBerita> {
         deskripsi: _isiKontenController.text.trim(),
         isiKonten: _isiKontenController.text.trim(),
         imgUrl: _imgUrlController.text.trim(),
-        mapsUrl: '',
       );
 
       if (!mounted) {

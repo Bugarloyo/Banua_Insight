@@ -67,9 +67,7 @@ class _HomePageState extends State<HomePage> {
       isiKonten:
           'Isi berita contoh. Ini hanya contoh untuk preview halaman detail.',
       imgUrl: '',
-      likesCount: 0,
       createdAt: Timestamp.now(),
-      mapsUrl: '',
     );
 
     Navigator.push(

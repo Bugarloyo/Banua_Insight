@@ -4,6 +4,7 @@ import '../models/news_model.dart';
 class NewsService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String _newsCollection = 'berita';
+  final String _likesCollection = 'likes';
 
   // [Umum] Mengambil semua Berita dalam bentuk Stream (real-time realtime)
   Stream<List<BeritaModel>> getBeritaStream() {
@@ -29,7 +30,6 @@ class NewsService {
     required String deskripsi,
     required String isiKonten,
     required String imgUrl,
-    required String mapsUrl,
   }) async {
     // Karena kita masih berbasis Document dari Firebase tapi IDnya butuh int,
     // kita menggunakan reference biasa dahulu lalu ambil hashCode dari id tsb menjadi idBerita (int)
@@ -43,7 +43,6 @@ class NewsService {
       isiKonten: isiKonten,
       imgUrl: imgUrl,
       createdAt: Timestamp.now(),
-      mapsUrl: mapsUrl,
     );
     await docRef.set(newBerita.toMap());
   }
@@ -55,7 +54,6 @@ class NewsService {
     required String deskripsi,
     required String isiKonten,
     String? imgUrl,
-    String? mapsUrl,
   }) async {
     // Cari dokumen aslinya di Firestore berdasarkan field id_berita
     QuerySnapshot query = await _firestore
@@ -72,7 +70,6 @@ class NewsService {
         'isi_konten': isiKonten,
       };
       if (imgUrl != null) updateData['img_url'] = imgUrl;
-      if (mapsUrl != null) updateData['maps_url'] = mapsUrl;
 
       await _firestore
           .collection(_newsCollection)

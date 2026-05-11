@@ -30,7 +30,6 @@ class _EditBeritaState extends State<EditBerita> {
   late final TextEditingController deskripsiController;
   late final TextEditingController isiController;
   late final TextEditingController imageUrlController;
-  late final TextEditingController mapsUrlController;
   final NewsService _newsService = NewsService();
 
   @override
@@ -40,7 +39,6 @@ class _EditBeritaState extends State<EditBerita> {
     deskripsiController = TextEditingController(text: widget.berita.deskripsi);
     isiController = TextEditingController(text: widget.berita.isiKonten);
     imageUrlController = TextEditingController(text: widget.berita.imgUrl);
-    mapsUrlController = TextEditingController(text: widget.berita.mapsUrl);
   }
 
   @override
@@ -49,7 +47,6 @@ class _EditBeritaState extends State<EditBerita> {
     deskripsiController.dispose();
     isiController.dispose();
     imageUrlController.dispose();
-    mapsUrlController.dispose();
     super.dispose();
   }
 
@@ -67,7 +64,6 @@ class _EditBeritaState extends State<EditBerita> {
         deskripsi: deskripsiController.text.trim(),
         isiKonten: isiController.text.trim(),
         imgUrl: imageUrlController.text.trim(),
-        mapsUrl: mapsUrlController.text.trim(),
       );
 
       if (!mounted) {

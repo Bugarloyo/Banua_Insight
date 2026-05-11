@@ -7,7 +7,6 @@ class BeritaModel {
   String isiKonten;
   String imgUrl;
   Timestamp createdAt;
-  String mapsUrl;
 
   BeritaModel({
     required this.idBerita,
@@ -16,7 +15,6 @@ class BeritaModel {
     required this.isiKonten,
     required this.imgUrl,
     required this.createdAt,
-    required this.mapsUrl,
   });
 
   // void tambahData() {
@@ -43,7 +41,6 @@ class BeritaModel {
       isiKonten: map['isi_konten'] ?? '',
       imgUrl: map['img_url'] ?? '',
       createdAt: map['created_at'] ?? Timestamp.now(),
-      mapsUrl: map['maps_url'] ?? '',
     );
   }
 
@@ -54,9 +51,7 @@ class BeritaModel {
       'deskripsi': deskripsi,
       'isi_konten': isiKonten,
       'img_url': imgUrl,
-      'created_at': createdAt,
-      'maps_url': mapsUrl,
+      'created_at': createdAt
     };
   }
 }
-
