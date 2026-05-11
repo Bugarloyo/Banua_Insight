@@ -44,6 +44,19 @@ class BeritaModel {
     );
   }
 
+  factory BeritaModel.fromWordPressJson(Map<String, dynamic> json) {
+    return BeritaModel(
+      idBerita: json['id'],
+      judul: json['title']?['rendered'] ?? '',
+      deskripsi: json['excerpt']?['rendered'] ?? '',
+      isiKonten: json['content']?['rendered'] ?? '',
+      imgUrl: json['_embedded']?['wp:featuredmedia']?[0]?['source_url'] ?? '',
+      createdAt: json['date'] != null 
+          ? Timestamp.fromDate(DateTime.parse(json['date'])) 
+          : Timestamp.now(),
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id_berita': idBerita,
