@@ -1,5 +1,6 @@
 import 'package:banuainsight_project/features/add_news/tambah_berita.dart';
 import 'package:banuainsight_project/features/search_news/cari_berita.dart';
+import 'package:banuainsight_project/features/save/simpan.dart';
 import 'package:flutter/material.dart';
 
 class Profile extends StatelessWidget {
@@ -79,7 +80,10 @@ class Profile extends StatelessWidget {
                 width: 350,
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    // Aksi ketika tombol ditekan, misalnya simpan perubahan profil
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Simpan()),
+                    );
                   },
                   icon: const Icon(Icons.save, color: Colors.white),
                   label: const Text('Tersimpan'),
