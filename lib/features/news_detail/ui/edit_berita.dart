@@ -1,17 +1,3 @@
-/*
-Commands to test EditBerita behavior:
-
-1. flutter pub get
-2. flutter run
-
-Testing steps:
-- Dari Homepage buka sebuah berita -> tekan menu 'Edit' untuk membuka layar EditBerita.
-- Ubah judul/deskripsi/isi/URL gambar/URL maps lalu tekan 'Simpan Berita'.
-- Jika berhasil, akan tampil SnackBar 'Berita berhasil disimpan' dan layar akan kembali.
-
-Use hot reload when making small changes: press 'r' in the Flutter terminal or use VS Code Hot Reload.
-*/
-
 import 'package:flutter/material.dart';
 import 'package:banuainsight_project/data/models/news_model.dart';
 import 'package:banuainsight_project/data/services/news_service.dart';
