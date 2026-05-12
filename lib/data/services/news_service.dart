@@ -1,36 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import '../models/news_model.dart';
 
 class NewsService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String _newsCollection = 'berita';
   final String _likesCollection = 'likes';
-  final String _baseUrl = 'https://redkal.com/wp-json/wp/v2';
 
   // [Umum] Mengambil Berita dari WordPress API
-  Future<List<BeritaModel>> getWordPressNews() async {
-    try {
-      final response = await http.get(
-        Uri.parse('$_baseUrl/posts?_embed'),
-      );
-
-      if (response.statusCode == 200) {
-        List<dynamic> body = jsonDecode(response.body);
-        List<BeritaModel> posts = body
-            .map(
-              (dynamic item) => BeritaModel.fromWordPressJson(item),
-            )
-            .toList();
-        return posts;
-      } else {
-        throw Exception("Failed to load news from WordPress");
-      }
-    } catch (e) {
-      throw Exception("Error fetching news: $e");
-    }
-  }
+  
 
   // [Umum] Mengambil semua Berita dalam bentuk Stream (real-time realtime)
   Stream<List<BeritaModel>> getBeritaStream() {
