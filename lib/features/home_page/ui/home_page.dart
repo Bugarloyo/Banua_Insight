@@ -102,7 +102,7 @@ class _HomePageState extends State<HomePage> {
                     topLeft: Radius.circular(15),
                     topRight: Radius.circular(15),
                   ),
-                  child: berita.imgUrl.startsWith('http')
+                  child: berita.imgUrl.startsWith('https')
                       ? Image.network(
                           berita.imgUrl,
                           width: 310,
@@ -205,7 +205,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: berita.imgUrl.startsWith('http')
+                child: berita.imgUrl.startsWith('https')
                     ? Image.network(
                         berita.imgUrl,
                         width: 100,
