@@ -1,6 +1,8 @@
 import 'package:banuainsight_project/data/services/news_service.dart';
 import 'package:banuainsight_project/features/search_news/cari_berita.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
+import 'dart:convert';
 
 class TambahBerita extends StatefulWidget {
   const TambahBerita({super.key});
@@ -233,6 +235,73 @@ class _TambahBeritaState extends State<TambahBerita> {
     );
   }
 
+  Future<void> _getScrapingData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response = await get(
+        Uri.parse('https://redkal.com/wp-json/wp/v2/posts?per_page=20'),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+
+        if (data.isNotEmpty) {
+          // final firstPost = data[0];
+          for (var i = 0; i < data.length; i++) {
+            print('proses data ke-${data.length}');
+            print('proses data ke-${i}');
+            if (i < 10) {
+              print('data ke-${i} diproses');
+            } else {
+              final String rawTitle = data[i]['title']['rendered'] ?? '';
+              final String rawContent = data[i]['content']['rendered'] ?? '';
+              final String urlImage =
+                  data[i]['yoast_head_json']['og_image'][0]['url'] ?? '';
+
+              // Basic HTML tag removal
+              final String cleanTitle = rawTitle.replaceAll(
+                RegExp(r'<[^>]*>|&#\d+;'),
+                '',
+              );
+              final String cleanContent = rawContent.replaceAll(
+                RegExp(r'<[^>]*>|&#\d+;'),
+                '',
+              );
+
+              sendDataAPIToDb(
+                title: cleanTitle,
+                content: cleanContent,
+                imageUrl: urlImage,
+              );
+            }
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Data berhasil diambil')),
+              );
+            }
+          }
+        }
+      } else {
+        throw Exception('Gagal mengambil data: ${response.statusCode}');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -294,6 +363,14 @@ class _TambahBeritaState extends State<TambahBerita> {
                     : Icons.cloud_upload_outlined,
                 onPressed: _isLoading ? null : _simpanBerita,
               ),
+              const SizedBox(height: 14),
+              _buildGreenButton(
+                label: 'tambah data scraping',
+                icon: _isLoading
+                    ? Icons.cloud_upload_outlined
+                    : Icons.cloud_upload_outlined,
+                onPressed: _getScrapingData,
+              ),
             ],
           ),
         ),
@@ -312,4 +389,19 @@ class _TambahBeritaState extends State<TambahBerita> {
       ),
     );
   }
+}
+
+void sendDataAPIToDb({
+  required String title,
+  required String content,
+  required String imageUrl,
+}) {
+  print('data yang dikirim ke API:');
+  print('Title: $title');
+  NewsService().addBerita(
+    judul: title,
+    deskripsi: content,
+    isiKonten: content,
+    imgUrl: imageUrl,
+  );
 }
