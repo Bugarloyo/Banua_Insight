@@ -65,8 +65,7 @@ class AuthService {
         password:
             password, // Peringatan: Sebaiknya jangan menyimpan plain password di Firestore untuk produksi
         email: email,
-        savedNews:
-            '', // String kosongan, atau bisa disesuaikan format JSON/ID array
+        savedNews: [], // Menggunakan List kosong sesuai perubahan tipe data di UserModel
         photoUrl: '', // Foto profil default kosongan
         nama: nama,
       );

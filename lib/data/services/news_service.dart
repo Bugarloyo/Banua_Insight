@@ -1,14 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:convert';
 import '../models/news_model.dart';
 
 class NewsService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String _newsCollection = 'berita';
   final String _likesCollection = 'likes';
-
-  // [Umum] Mengambil Berita dari WordPress API
-  
 
   // [Umum] Mengambil semua Berita dalam bentuk Stream (real-time realtime)
   Stream<List<BeritaModel>> getBeritaStream() {
