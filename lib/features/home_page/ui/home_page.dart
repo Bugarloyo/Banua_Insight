@@ -3,8 +3,9 @@ import 'package:banuainsight_project/features/add_news/tambah_berita.dart';
 import 'package:banuainsight_project/features/search_news/cari_berita.dart';
 import 'package:banuainsight_project/features/profile/profile.dart';
 import 'package:banuainsight_project/data/models/news_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:banuainsight_project/data/services/news_service.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,13 +16,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-
-  static const String _sampleImage = 'assets/img/download.jpg';
-  static const String _sampleTitle =
-      'Ini adalah artikel kucing yang jarang di temui oleh orang lain';
-  static const String _sampleDate = 'Senin 30 Maret 2026';
-  static const String _viralTitle =
-      'BANJARBARU - Polda Kalsel gelar razia lagi! Terhitung sejak hari ini, Senin (10/2/2025), Polda Kalimantan Selatan';
+  final NewsService _newsService = NewsService();
 
   Future<void> _onItemTapped(int index) async {
     if (index == 1) {
@@ -59,20 +54,10 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _openDetailBerita() {
-    final sample = BeritaModel(
-      idBerita: 0,
-      judul: _sampleTitle,
-      deskripsi: 'Deskripsi contoh',
-      isiKonten:
-          'Isi berita contoh. Ini hanya contoh untuk preview halaman detail.',
-      imgUrl: '',
-      createdAt: Timestamp.now(),
-    );
-
+  void _openDetailBerita(BeritaModel berita) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => DetailBerita(berita: sample)),
+      MaterialPageRoute(builder: (context) => DetailBerita(berita: berita)),
     );
   }
 
@@ -93,14 +78,20 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildRecommendationCard({required EdgeInsetsGeometry margin}) {
+  Widget _buildRecommendationCard({
+    required BeritaModel berita,
+    required EdgeInsetsGeometry margin,
+  }) {
+    String formattedDate =
+        DateFormat('EEEE, d MMMM yyyy', 'id_ID').format(berita.createdAt.toDate());
+
     return Align(
       alignment: Alignment.centerLeft,
       child: Padding(
         padding: margin,
         child: InkWell(
           borderRadius: BorderRadius.circular(15),
-          onTap: _openDetailBerita,
+          onTap: () => _openDetailBerita(berita),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -111,12 +102,24 @@ class _HomePageState extends State<HomePage> {
                     topLeft: Radius.circular(15),
                     topRight: Radius.circular(15),
                   ),
-                  child: Image.asset(
-                    _sampleImage,
-                    width: 310,
-                    height: 170,
-                    fit: BoxFit.cover,
-                  ),
+                  child: berita.imgUrl.startsWith('http')
+                      ? Image.network(
+                          berita.imgUrl,
+                          width: 310,
+                          height: 170,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const SizedBox(
+                            width: 310,
+                            height: 170,
+                            
+                          ),
+                        )
+                      : const SizedBox(
+                          width: 310,
+                          height: 170,
+                          
+                        ),
                 ),
               ),
               Container(
@@ -137,14 +140,14 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
-                child: const Padding(
-                  padding: EdgeInsets.all(12.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _sampleTitle,
-                        style: TextStyle(
+                        berita.judul,
+                        style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.normal,
                           color: Colors.black,
@@ -152,10 +155,10 @@ class _HomePageState extends State<HomePage> {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(height: 10),
-                      Text(_sampleDate, style: TextStyle(fontSize: 10)),
-                      SizedBox(height: 10),
-                      Row(
+                      const SizedBox(height: 10),
+                      Text(formattedDate, style: const TextStyle(fontSize: 10)),
+                      const SizedBox(height: 10),
+                      const Row(
                         children: [
                           Text(
                             'BANUA',
@@ -187,28 +190,46 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildViralItem({required EdgeInsetsGeometry padding}) {
+  Widget _buildViralItem({
+    required BeritaModel berita,
+    required EdgeInsetsGeometry padding,
+  }) {
     return Align(
       alignment: Alignment.centerLeft,
       child: InkWell(
-        onTap: _openDetailBerita,
+        onTap: () => _openDetailBerita(berita),
         child: Padding(
           padding: padding,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset(
-                _sampleImage,
-                width: 100,
-                height: 100,
-                fit: BoxFit.cover,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: berita.imgUrl.startsWith('http')
+                    ? Image.network(
+                        berita.imgUrl,
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const SizedBox(
+                          width: 100,
+                          height: 100,
+                          child: Center(child: Icon(Icons.broken_image)),
+                        ),
+                      )
+                    : const SizedBox(
+                        width: 100,
+                        height: 100,
+                        child: Center(child: Icon(Icons.image_not_supported)),
+                      ),
               ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-                  child: const Text(
-                    _viralTitle,
-                    style: TextStyle(
+                  child: Text(
+                    berita.judul,
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -278,52 +299,67 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 20),
             const Divider(color: Colors.grey, thickness: 1, height: 2),
             _buildSectionTitle('Rekomendasi'),
-            SizedBox(
-              height: 310,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  _buildRecommendationCard(
-                    margin: const EdgeInsets.only(left: 20.0),
+            StreamBuilder<List<BeritaModel>>(
+              stream: _newsService.getBeritaStream(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const SizedBox(
+                    height: 310,
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const SizedBox(
+                    height: 310,
+                    child: Center(child: Text("Tidak ada rekomendasi")),
+                  );
+                }
+                final listBerita = snapshot.data!;
+                return SizedBox(
+                  height: 310,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: listBerita.length,
+                    itemBuilder: (context, index) {
+                      return _buildRecommendationCard(
+                        berita: listBerita[index],
+                        margin: EdgeInsets.only(
+                          left: 20.0,
+                          right: index == listBerita.length - 1 ? 20.0 : 0,
+                        ),
+                      );
+                    },
                   ),
-                  _buildRecommendationCard(
-                    margin: const EdgeInsets.only(left: 20.0),
-                  ),
-                  _buildRecommendationCard(
-                    margin: const EdgeInsets.only(left: 20.0),
-                  ),
-                  _buildRecommendationCard(
-                    margin: const EdgeInsets.only(left: 20.0, right: 20.0),
-                  ),
-                ],
-              ),
+                );
+              },
             ),
             _buildSectionTitle('Berita Viral'),
-            ListView(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              scrollDirection: Axis.vertical,
-              children: [
-                _buildViralItem(
-                  padding: const EdgeInsets.only(left: 20.0, top: 10.0),
-                ),
-                _buildViralItem(
-                  padding: const EdgeInsets.only(left: 20.0, top: 10.0),
-                ),
-                _buildViralItem(
-                  padding: const EdgeInsets.only(left: 20.0, top: 10.0),
-                ),
-                _buildViralItem(
-                  padding: const EdgeInsets.only(left: 20.0, top: 10.0),
-                ),
-                _buildViralItem(
-                  padding: const EdgeInsets.only(
-                    left: 20.0,
-                    top: 10.0,
-                    bottom: 20.0,
-                  ),
-                ),
-              ],
+            StreamBuilder<List<BeritaModel>>(
+              stream: _newsService.getBeritaStream(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text("Tidak ada berita viral"));
+                }
+                final listBerita = snapshot.data!;
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: listBerita.length,
+                  itemBuilder: (context, index) {
+                    return _buildViralItem(
+                      berita: listBerita[index],
+                      padding: EdgeInsets.only(
+                        left: 20.0,
+                        top: 10.0,
+                        bottom: index == listBerita.length - 1 ? 20.0 : 0,
+                      ),
+                    );
+                  },
+                );
+              },
             ),
           ],
         ),

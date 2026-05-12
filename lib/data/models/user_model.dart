@@ -4,7 +4,7 @@ class UserModel {
   String role;
   String password;
   String email;
-  List<int> savedNews;
+  String savedNews;
   String photoUrl;
   String nama;
 
@@ -34,7 +34,7 @@ class UserModel {
       role: map['role'] ?? 'user',
       password: map['password'] ?? '',
       email: map['email'] ?? '',
-      savedNews: (map['saved_news'] as List<dynamic>?)?.map((e) => e as int).toList() ?? [],
+      savedNews: map['saved_news'] ?? '',
       photoUrl: map['photo_url'] ?? '',
       nama: map['nama'] ?? '',
     );

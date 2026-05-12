@@ -1,12 +1,13 @@
 import 'package:banuainsight_project/features/login/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'firebase_options.dart';
-// import 'package:banuainsight_project/features/news_detail/ui/detail_berita.dart'; // import halaman baru
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await initializeDateFormatting('id_ID', null);
   runApp(const MyApp());
 }
 
