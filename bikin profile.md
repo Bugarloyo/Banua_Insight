@@ -4,21 +4,16 @@ Tanggal: 10 Mei 2026
 
 ## Ringkasan Perubahan
 
-Hari ini saya membantu merapikan beberapa bagian aplikasi Banua Insight:
+Hari ini saya memperbarui halaman profile supaya lebih informatif dan lebih hidup:
 
-1. Menghubungkan avatar di halaman Home ke halaman Profile.
-2. Memperbaiki error struktur widget di `profile.dart`.
-3. Menyusun ulang layout Profile supaya isi halaman bisa digeser bersama dengan satu `Transform.translate`.
-4. Memperbaiki bottom navigation bar di halaman Profile.
-5. Memperbaiki halaman `CariBerita` supaya navbar-nya konsisten dan tab aktifnya benar.
-6. Memperbaiki halaman `TambahBerita` supaya tombol Search di navbar bisa dipencet dan pindah ke halaman cari berita.
+1. Profile sekarang mengambil `username` dari Firestore lewat `AuthService.getCurrentUserData()`.
+2. Avatar profile sekarang menampilkan inisial username.
+3. Warna background avatar dibuat berubah-ubah berdasarkan username, jadi terlihat random tetapi tetap konsisten untuk user yang sama.
+4. Dokumen catatan profile ini diperbarui agar sesuai dengan implementasi terbaru.
 
 ## File yang Terdampak
 
-- `lib/features/home_page/ui/home_page.dart`
 - `lib/features/profile/profile.dart`
-- `lib/features/search_news/cari_berita.dart`
-- `lib/features/add_news/tambah_berita.dart`
 
 ## Fungsi / Widget Flutter yang Dipakai
 
@@ -63,6 +58,6 @@ Hari ini saya membantu merapikan beberapa bagian aplikasi Banua Insight:
 
 ## Catatan Singkat
 
-- Dokumen ini dibuat sebagai catatan pekerjaan hari ini.
+- Dokumen ini dibuat sebagai catatan perubahan profile hari ini.
 - File ini masih berada di workspace dan belum di-commit.
 - Kalau nanti ada perubahan tambahan, dokumen ini bisa diperbarui lagi.

@@ -28,6 +28,8 @@ class _RegisterPageState extends State<RegisterPage>
 
   // Loading state untuk tombol
   bool _isLoading = false;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void initState() {
@@ -356,14 +358,23 @@ class _RegisterPageState extends State<RegisterPage>
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(color: Colors.grey.shade400),
                         ),
-                        child: TextField(
+                        child: TextFormField(
                           controller: _passwordController,
-                          obscureText: true,
+                          obscureText: _obscurePassword,
                           decoration: InputDecoration(
                             hintText: 'Masukkan Password',
-                            suffixIcon: const Icon(
-                              Icons.visibility_outlined,
-                              color: Color.fromARGB(221, 101, 101, 101),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                                color: Color.fromARGB(221, 101, 101, 101),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
                             ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
@@ -381,14 +392,24 @@ class _RegisterPageState extends State<RegisterPage>
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(color: Colors.grey.shade400),
                         ),
-                        child: TextField(
+                        child: TextFormField(
                           controller: _confirmPasswordController,
-                          obscureText: true,
+                          obscureText: _obscureConfirmPassword,
                           decoration: InputDecoration(
-                            hintText: 'Konfirmasi Password',
-                            suffixIcon: const Icon(
-                              Icons.visibility_outlined,
-                              color: Color.fromARGB(221, 101, 101, 101),
+                            hintText: 'Masukkan Konfirmasi Password',
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscureConfirmPassword
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                                color: Color.fromARGB(221, 101, 101, 101),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscureConfirmPassword =
+                                      !_obscureConfirmPassword;
+                                });
+                              },
                             ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(

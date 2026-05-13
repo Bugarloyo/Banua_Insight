@@ -1,5 +1,8 @@
-import "package:flutter/material.dart";
+import 'package:banuainsight_project/data/models/news_model.dart';
+import 'package:banuainsight_project/data/services/news_service.dart';
 import 'package:banuainsight_project/features/add_news/tambah_berita.dart';
+import 'package:banuainsight_project/features/news_detail/ui/detail_berita.dart';
+import 'package:flutter/material.dart';
 
 class CariBerita extends StatefulWidget {
   final int selectedIndex;
@@ -12,27 +15,8 @@ class CariBerita extends StatefulWidget {
 
 class _CariBeritaState extends State<CariBerita> {
   final TextEditingController _searchController = TextEditingController();
+  final NewsService _newsService = NewsService();
   late int _selectedIndex;
-
-  final List<String> _allSuggestions = const [
-    'BANJARBARU',
-    'KALIMANTAN SELATAN',
-    'Wisata di banjarbaru',
-    'search 1',
-    'search 1',
-  ];
-
-  List<String> get _filteredSuggestions {
-    final query = _searchController.text.trim().toLowerCase();
-
-    if (query.isEmpty) {
-      return _allSuggestions;
-    }
-
-    return _allSuggestions
-        .where((suggestion) => suggestion.toLowerCase().contains(query))
-        .toList();
-  }
 
   @override
   void initState() {
@@ -44,6 +28,24 @@ class _CariBeritaState extends State<CariBerita> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  bool _matchesQuery(BeritaModel berita, String query) {
+    if (query.isEmpty) {
+      return true;
+    }
+
+    final lowerQuery = query.toLowerCase();
+    return berita.judul.toLowerCase().contains(lowerQuery) ||
+        berita.deskripsi.toLowerCase().contains(lowerQuery) ||
+        berita.isiKonten.toLowerCase().contains(lowerQuery);
+  }
+
+  void _openDetailBerita(BeritaModel berita) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => DetailBerita(berita: berita)),
+    );
   }
 
   Future<void> _onItemTapped(BuildContext context, int index) async {
@@ -135,65 +137,145 @@ class _CariBeritaState extends State<CariBerita> {
               ],
             ),
             const SizedBox(height: 10),
-            if (_filteredSuggestions.isNotEmpty)
-              Row(
-                children: [
-                  const SizedBox(width: 36),
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF4F982A),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.12),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Column(
-                          children: _filteredSuggestions.map((suggestion) {
-                            return InkWell(
-                              onTap: () {
-                                _searchController.text = suggestion;
-                                setState(() {});
-                              },
-                              child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 12,
-                                ),
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.black.withValues(
-                                        alpha: 0.12,
-                                      ),
-                                      width: 1,
-                                    ),
-                                  ),
-                                ),
-                                child: Text(
-                                  suggestion,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
+            StreamBuilder<List<BeritaModel>>(
+              stream: _newsService.getBeritaStream(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Padding(
+                    padding: EdgeInsets.only(top: 24),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+
+                if (snapshot.hasError) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 24),
+                    child: Text(
+                      'Gagal memuat berita: ${snapshot.error}',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  );
+                }
+
+                final query = _searchController.text.trim();
+                final filteredNews =
+                    snapshot.data
+                        ?.where((berita) => _matchesQuery(berita, query))
+                        .toList() ??
+                    [];
+
+                if (filteredNews.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.only(top: 24),
+                    child: Center(
+                      child: Text(
+                        'Tidak ada berita yang cocok.',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF2B2B2B),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
+                  );
+                }
+
+                return ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: filteredNews.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    final berita = filteredNews[index];
+
+                    return InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () => _openDetailBerita(berita),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.08),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: berita.imgUrl.startsWith('http')
+                                    ? Image.network(
+                                        berita.imgUrl,
+                                        width: 88,
+                                        height: 88,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                              return Container(
+                                                width: 88,
+                                                height: 88,
+                                                color: const Color(0xFFEFEFEF),
+                                                child: const Icon(
+                                                  Icons.image_not_supported,
+                                                  color: Colors.grey,
+                                                ),
+                                              );
+                                            },
+                                      )
+                                    : Container(
+                                        width: 88,
+                                        height: 88,
+                                        color: const Color(0xFFEFEFEF),
+                                        child: const Icon(
+                                          Icons.image_outlined,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      berita.judul,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF2B2B2B),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      berita.deskripsi,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFF666666),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
           ],
         ),
       ),
