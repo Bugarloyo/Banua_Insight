@@ -1,3 +1,4 @@
+import 'package:banuainsight_project/features/search_news/cari_berita.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:banuainsight_project/features/add_news/tambah_berita.dart';
@@ -27,6 +28,14 @@ class _DetailBeritaState extends State<DetailBerita> {
     // Index 0: Beranda (kembali ke route pertama)
     if (index == 0) {
       Navigator.of(context).popUntil((route) => route.isFirst);
+      return;
+    }
+
+     if (index == 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const CariBerita()),
+      );
       return;
     }
 
@@ -84,7 +93,7 @@ class _DetailBeritaState extends State<DetailBerita> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF9F6),
+        
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -228,7 +237,7 @@ class _DetailBeritaState extends State<DetailBerita> {
                         isSaved
                             ? CupertinoIcons.bookmark_fill
                             : CupertinoIcons.bookmark_fill,
-                        size: 26,
+                        size: 24,
                         color: isSaved ? Colors.orange : Colors.black,
                       ),
                     ),
@@ -288,7 +297,7 @@ class _DetailBeritaState extends State<DetailBerita> {
         ],
         currentIndex: _selectedIndex,
         unselectedItemColor: Colors.amber[800],
-        selectedItemColor: const Color.fromARGB(255, 51, 96, 33),
+        selectedItemColor: Colors.amber[800],
         onTap: _onItemTapped,
       ),
     );
