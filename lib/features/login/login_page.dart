@@ -28,6 +28,7 @@ class _LoginPageState extends State<LoginPage>
 
   // Loading state untuk tombol
   bool _isLoading = false;
+  bool _obscureText = true;
 
   @override
   void initState() {
@@ -379,14 +380,23 @@ class _LoginPageState extends State<LoginPage>
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(color: Colors.grey.shade400),
                         ),
-                        child: TextField(
+                        child: TextFormField(
                           controller: _passwordController,
-                          obscureText: true,
+                          obscureText: _obscureText,
                           decoration: InputDecoration(
                             hintText: 'Masukkan Password',
-                            suffixIcon: const Icon(
-                              Icons.visibility_outlined,
-                              color: Color.fromARGB(221, 101, 101, 101),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscureText
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                                color: Color.fromARGB(221, 101, 101, 101),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscureText = !_obscureText;
+                                });
+                              },
                             ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(

@@ -1,6 +1,7 @@
 import 'package:banuainsight_project/features/add_news/tambah_berita.dart';
 import 'package:banuainsight_project/features/search_news/cari_berita.dart';
 import 'package:banuainsight_project/features/save/simpan.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Profile extends StatelessWidget {
@@ -85,8 +86,8 @@ class Profile extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => const Simpan()),
                     );
                   },
-                  icon: const Icon(Icons.save, color: Colors.white),
-                  label: const Text('Tersimpan'),
+                  icon: const Icon(CupertinoIcons.bookmark_fill, color: Colors.white, size: 18,),
+                  label: const Text('Bookmarks'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 76, 175, 80),
                     foregroundColor: Colors.white,
@@ -102,7 +103,10 @@ class Profile extends StatelessWidget {
                 width: 350,
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    // Aksi ketika tombol ditekan, misalnya keluar dari akun
+                    Navigator.pushNamedAndRemoveUntil
+                    (context, '/Login', 
+                    (route) => false
+                    );
                   },
                   icon: const Icon(Icons.logout, color: Colors.white),
                   label: const Text('Keluar'),
@@ -132,7 +136,7 @@ class Profile extends StatelessWidget {
         ],
         currentIndex: 0,
         unselectedItemColor: Colors.amber[800],
-        selectedItemColor: const Color.fromARGB(255, 51, 96, 33),
+        selectedItemColor:  Colors.amber[800],
         onTap: (index) => _onItemTapped(context, index),
       ),
     );

@@ -23,6 +23,10 @@ class MyApp extends StatelessWidget {
       ),
       // Kita ubah *home* nya dari SplashScreen menjadi DetailBerita agar langsung muncul saat di-run
       home: const SplashScreen(),
+      initialRoute: '/Login', // Set initial route ke halaman Login
+      routes: {
+        '/splashscreen': (context) => const SplashScreen(), // Rute untuk halaman SplashScreen
+      },
     );
   }
 }
