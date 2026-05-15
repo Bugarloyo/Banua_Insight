@@ -1,4 +1,6 @@
 import 'package:banuainsight_project/data/services/news_service.dart';
+import 'package:banuainsight_project/data/services/auth_service.dart';
+import 'package:banuainsight_project/data/models/user_model.dart';
 import 'package:banuainsight_project/features/search_news/cari_berita.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -14,6 +16,7 @@ class TambahBerita extends StatefulWidget {
 class _TambahBeritaState extends State<TambahBerita> {
   final _formKey = GlobalKey<FormState>();
   final NewsService _newsService = NewsService();
+  final AuthService _authService = AuthService();
 
   final TextEditingController _judulController = TextEditingController();
   final TextEditingController _isiKontenController = TextEditingController();
@@ -62,11 +65,18 @@ class _TambahBeritaState extends State<TambahBerita> {
     });
 
     try {
+      final UserModel? currentUser = await _authService.getCurrentUserData();
+      if (currentUser == null || currentUser.role.toLowerCase() != 'admin') {
+        throw 'Data admin tidak ditemukan';
+      }
+
       await _newsService.addBerita(
         judul: _judulController.text.trim(),
         deskripsi: _isiKontenController.text.trim(),
         isiKonten: _isiKontenController.text.trim(),
         imgUrl: _imgUrlController.text.trim(),
+        idUserAdmin: currentUser.idUser,
+        namaAdmin: currentUser.nama,
       );
 
       if (!mounted) {
@@ -398,10 +408,18 @@ void sendDataAPIToDb({
 }) {
   print('data yang dikirim ke API:');
   print('Title: $title');
-  NewsService().addBerita(
-    judul: title,
-    deskripsi: content,
-    isiKonten: content,
-    imgUrl: imageUrl,
-  );
+  final authService = AuthService();
+  authService.getCurrentUserData().then((currentUser) {
+    if (currentUser == null || currentUser.role.toLowerCase() != 'admin') {
+      throw 'Data admin tidak ditemukan';
+    }
+    return NewsService().addBerita(
+      judul: title,
+      deskripsi: content,
+      isiKonten: content,
+      imgUrl: imageUrl,
+      idUserAdmin: currentUser.idUser,
+      namaAdmin: currentUser.nama,
+    );
+  });
 }

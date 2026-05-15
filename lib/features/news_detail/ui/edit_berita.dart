@@ -37,9 +37,45 @@ class _EditBeritaState extends State<EditBerita> {
   }
 
   void _handleEditGambar() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Fitur edit gambar akan segera hadir')),
+    _showImageUrlDialog();
+  }
+
+  Future<void> _showImageUrlDialog() async {
+    final imageUrlEditController = TextEditingController(text: imageUrlController.text);
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: const Text('Edit URL Gambar'),
+          content: TextField(
+            controller: imageUrlEditController,
+            decoration: const InputDecoration(
+              hintText: 'Masukkan URL gambar',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 76, 175, 80)),
+              onPressed: () {
+                setState(() {
+                  imageUrlController.text = imageUrlEditController.text.trim();
+                });
+                Navigator.of(dialogContext).pop();
+              },
+              child: const Text('Simpan'),
+            ),
+          ],
+        );
+      },
     );
+    imageUrlEditController.dispose();
   }
 
   Future<void> _handleSimpanBerita() async {

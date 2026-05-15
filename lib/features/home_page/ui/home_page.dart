@@ -354,7 +354,7 @@ class _HomePageState extends State<HomePage> {
                       padding: EdgeInsets.only(
                         left: 20.0,
                         top: 10.0,
-                        bottom: index == listBerita.length - 1 ? 20.0 : 0,
+                        bottom: index == listBerita.length - 1 ? 10.0 : 0,
                       ),
                     );
                   },

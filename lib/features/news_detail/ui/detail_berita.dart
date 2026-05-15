@@ -2,7 +2,9 @@ import 'package:banuainsight_project/features/search_news/cari_berita.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:banuainsight_project/features/add_news/tambah_berita.dart';
+import 'package:banuainsight_project/data/models/user_model.dart';
 import 'package:banuainsight_project/data/models/news_model.dart';
+import 'package:banuainsight_project/data/services/auth_service.dart';
 import 'package:banuainsight_project/data/services/news_service.dart';
 import 'edit_berita.dart';
 import 'hapus_berita.dart';
@@ -19,10 +21,47 @@ class DetailBerita extends StatefulWidget {
 class _DetailBeritaState extends State<DetailBerita> {
   bool isLiked = false;
   bool isSaved = false;
+  bool _isLoadingAction = false;
   final NewsService _newsService = NewsService();
+  final AuthService _authService = AuthService();
+  UserModel? _currentUser;
 
   // Variabel dan fungsi untuk BottomNavigationBar
   int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInteractionState();
+  }
+
+  Future<void> _loadInteractionState() async {
+    final user = await _authService.getCurrentUserData();
+    if (!mounted) return;
+
+    if (user == null) {
+      setState(() {
+        _currentUser = null;
+      });
+      return;
+    }
+
+    final liked = await _newsService.isBeritaLiked(
+      user.idUser,
+      widget.berita.idBerita,
+    );
+    final bookmarked = await _newsService.isBeritaBookmarked(
+      user.idUser,
+      widget.berita.idBerita,
+    );
+
+    if (!mounted) return;
+    setState(() {
+      _currentUser = user;
+      isLiked = liked;
+      isSaved = bookmarked;
+    });
+  }
 
   void _onItemTapped(int index) {
     // Index 0: Beranda (kembali ke route pertama)
@@ -31,7 +70,7 @@ class _DetailBeritaState extends State<DetailBerita> {
       return;
     }
 
-     if (index == 1) {
+    if (index == 1) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const CariBerita()),
@@ -71,6 +110,56 @@ class _DetailBeritaState extends State<DetailBerita> {
     }
   }
 
+  Future<void> _toggleLike() async {
+    if (_currentUser == null) return;
+
+    setState(() {
+      _isLoadingAction = true;
+    });
+
+    try {
+      await _newsService.toggleLikeBerita(
+        _currentUser!.idUser,
+        widget.berita.idBerita,
+      );
+      if (!mounted) return;
+      setState(() {
+        isLiked = !isLiked;
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingAction = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _toggleBookmark() async {
+    if (_currentUser == null) return;
+
+    setState(() {
+      _isLoadingAction = true;
+    });
+
+    try {
+      await _newsService.toggleBookmarkBerita(
+        _currentUser!.idUser,
+        widget.berita.idBerita,
+      );
+      if (!mounted) return;
+      setState(() {
+        isSaved = !isSaved;
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingAction = false;
+        });
+      }
+    }
+  }
+
   String _formatDate(DateTime dateTime) {
     const months = [
       'Januari',
@@ -93,7 +182,7 @@ class _DetailBeritaState extends State<DetailBerita> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        
+      backgroundColor: const Color.fromARGB(255, 239, 239, 239),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -138,19 +227,9 @@ class _DetailBeritaState extends State<DetailBerita> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _formatDate(widget.berita.createdAt.toDate()),
-                      style: TextStyle(fontSize: 12, color: Colors.black87),
-                    ),
-                    const SizedBox(height: 2),
-                    const Text(
-                      'di upload oleh admin',
-                      style: TextStyle(fontSize: 12, color: Colors.black87),
-                    ),
-                  ],
+                Text(
+                  _formatDate(widget.berita.createdAt.toDate()),
+                  style: const TextStyle(fontSize: 12, color: Colors.black87),
                 ),
                 Row(
                   children: [
@@ -223,7 +302,7 @@ class _DetailBeritaState extends State<DetailBerita> {
                     ),
                     const SizedBox(width: 15),
                     GestureDetector(
-                      onTap: () => setState(() => isLiked = !isLiked),
+                      onTap: _isLoadingAction ? null : _toggleLike,
                       child: Icon(
                         isLiked ? Icons.thumb_up : Icons.thumb_up_alt_rounded,
                         size: 24,
@@ -232,11 +311,9 @@ class _DetailBeritaState extends State<DetailBerita> {
                     ),
                     const SizedBox(width: 15),
                     GestureDetector(
-                      onTap: () => setState(() => isSaved = !isSaved),
+                      onTap: _isLoadingAction ? null : _toggleBookmark,
                       child: Icon(
-                        isSaved
-                            ? CupertinoIcons.bookmark_fill
-                            : CupertinoIcons.bookmark_fill,
+                        CupertinoIcons.bookmark_fill,
                         size: 24,
                         color: isSaved ? Colors.orange : Colors.black,
                       ),
@@ -269,6 +346,13 @@ class _DetailBeritaState extends State<DetailBerita> {
                         );
                       },
                     ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              widget.berita.namaAdmin.isEmpty
+                  ? 'Di upload oleh admin'
+                  : 'Di upload oleh ${widget.berita.namaAdmin} (ID: ${widget.berita.idUserAdmin})',
+              style: const TextStyle(fontSize: 12, color: Colors.black87),
             ),
             const SizedBox(height: 20),
             Text(
