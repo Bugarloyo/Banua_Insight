@@ -84,6 +84,24 @@ class NewsService {
     }
   }
 
+  Future<BeritaModel?> getBeritaById(int idBerita) async {
+    final query = await _firestore
+        .collection(_newsCollection)
+        .where('id_berita', isEqualTo: idBerita)
+        .limit(1)
+        .get();
+
+    if (query.docs.isEmpty) {
+      return null;
+    }
+
+    final doc = query.docs.first;
+    return BeritaModel.fromMap(
+      doc.data(),
+      doc['id_berita'] ?? doc.id.hashCode,
+    );
+  }
+
   // [Admin] Menghapus Berita
   Future<void> deleteBerita(int idBerita) async {
     QuerySnapshot query = await _firestore

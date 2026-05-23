@@ -17,6 +17,7 @@ class _EditBeritaState extends State<EditBerita> {
   late final TextEditingController isiController;
   late final TextEditingController imageUrlController;
   final NewsService _newsService = NewsService();
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -79,6 +80,15 @@ class _EditBeritaState extends State<EditBerita> {
   }
 
   Future<void> _handleSimpanBerita() async {
+    // Cegah multiple clicks
+    if (_isSaving) return;
+
+    if (!mounted) return;
+
+    setState(() {
+      _isSaving = true;
+    });
+
     try {
       await _newsService.editBerita(
         idBerita: widget.berita.idBerita,
@@ -88,22 +98,28 @@ class _EditBeritaState extends State<EditBerita> {
         imgUrl: imageUrlController.text.trim(),
       );
 
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Berita berhasil disimpan')));
-      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Berita berhasil disimpan')),
+      );
+
+      // Tunggu frame rendering selesai sebelum pop
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          Navigator.pop(context, true);
+        }
+      });
     } catch (error) {
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Gagal menyimpan berita: $error')));
+      setState(() {
+        _isSaving = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal menyimpan berita: $error')),
+      );
     }
   }
 
@@ -284,9 +300,19 @@ class _EditBeritaState extends State<EditBerita> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: _handleSimpanBerita,
-                icon: const Icon(Icons.check),
-                label: const Text('Simpan Berita'),
+                onPressed: _isSaving ? null : _handleSimpanBerita,
+                icon: _isSaving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : const Icon(Icons.check),
+                label: Text(_isSaving ? 'Menyimpan...' : 'Simpan Berita'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(255, 76, 175, 80),
                   foregroundColor: Colors.white,

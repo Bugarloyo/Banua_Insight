@@ -353,8 +353,9 @@ class _HomePageState extends State<HomePage> {
                       berita: listBerita[index],
                       padding: EdgeInsets.only(
                         left: 20.0,
-                        top: 10.0,
-                        bottom: index == listBerita.length - 1 ? 10.0 : 0,
+                        right: 20.0,
+                        top: 0.0,
+                        bottom: 10.0,
                       ),
                     );
                   },
