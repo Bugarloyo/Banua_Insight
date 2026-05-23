@@ -373,14 +373,14 @@ class _TambahBeritaState extends State<TambahBerita> {
                     : Icons.cloud_upload_outlined,
                 onPressed: _isLoading ? null : _simpanBerita,
               ),
-              const SizedBox(height: 14),
-              _buildGreenButton(
-                label: 'tambah data scraping',
-                icon: _isLoading
-                    ? Icons.cloud_upload_outlined
-                    : Icons.cloud_upload_outlined,
-                onPressed: _getScrapingData,
-              ),
+              // const SizedBox(height: 14),
+              // _buildGreenButton(
+              //   label: 'tambah data scraping',
+              //   icon: _isLoading
+              //       ? Icons.cloud_upload_outlined
+              //       : Icons.cloud_upload_outlined,
+              //   onPressed: _getScrapingData,
+              // ),
             ],
           ),
         ),
