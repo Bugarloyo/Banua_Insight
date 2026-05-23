@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/bookmark_model.dart';
 import '../models/news_model.dart';
 
 class NewsService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String _newsCollection = 'berita';
   final String _likesCollection = 'likes';
+  final String _bookmarksCollection = 'bookmarks';
 
   // [Umum] Mengambil semua Berita dalam bentuk Stream (real-time realtime)
   Stream<List<BeritaModel>> getBeritaStream() {
@@ -30,6 +32,8 @@ class NewsService {
     required String deskripsi,
     required String isiKonten,
     required String imgUrl,
+    required int idUserAdmin,
+    required String namaAdmin,
   }) async {
     // Karena kita masih berbasis Document dari Firebase tapi IDnya butuh int,
     // kita menggunakan reference biasa dahulu lalu ambil hashCode dari id tsb menjadi idBerita (int)
@@ -38,6 +42,8 @@ class NewsService {
 
     final newBerita = BeritaModel(
       idBerita: idBerita,
+      idUserAdmin: idUserAdmin,
+      namaAdmin: namaAdmin,
       judul: judul,
       deskripsi: deskripsi,
       isiKonten: isiKonten,
@@ -124,6 +130,25 @@ class NewsService {
     }
   }
 
+  // [User] Fitur Save / Bookmark Berita
+  Future<void> toggleBookmarkBerita(int idUser, int idBerita) async {
+    QuerySnapshot bookmarkQuery = await _firestore
+        .collection(_bookmarksCollection)
+        .where('id_user', isEqualTo: idUser)
+        .where('id_berita', isEqualTo: idBerita)
+        .get();
+
+    if (bookmarkQuery.docs.isEmpty) {
+      await _firestore.collection(_bookmarksCollection).add({
+        'id_user': idUser,
+        'id_berita': idBerita,
+        'created_at': FieldValue.serverTimestamp(),
+      });
+    } else {
+      await bookmarkQuery.docs.first.reference.delete();
+    }
+  }
+
   // [User] Mengecek apakah user sudah like berita tertentu
   Future<bool> isBeritaLiked(int idUser, int idBerita) async {
     QuerySnapshot query = await _firestore
@@ -132,6 +157,52 @@ class NewsService {
         .where('id_berita', isEqualTo: idBerita)
         .get();
     return query.docs.isNotEmpty;
+  }
+
+  // [User] Mengecek apakah berita sudah di-save
+  Future<bool> isBeritaBookmarked(int idUser, int idBerita) async {
+    QuerySnapshot query = await _firestore
+        .collection(_bookmarksCollection)
+        .where('id_user', isEqualTo: idUser)
+        .where('id_berita', isEqualTo: idBerita)
+        .get();
+    return query.docs.isNotEmpty;
+  }
+
+  Stream<List<BeritaModel>> getBookmarkedBeritaStream(int idUser) {
+    return _firestore
+        .collection(_bookmarksCollection)
+        .where('id_user', isEqualTo: idUser)
+        .snapshots()
+        .asyncMap((snapshot) async {
+          final bookmarks =
+              snapshot.docs
+                  .map((doc) => BookmarkModel.fromMap(doc.data(), doc.id))
+                  .toList()
+                ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+          final newsItems = await Future.wait(
+            bookmarks.map((bookmark) async {
+              final newsQuery = await _firestore
+                  .collection(_newsCollection)
+                  .where('id_berita', isEqualTo: bookmark.idBerita)
+                  .limit(1)
+                  .get();
+
+              if (newsQuery.docs.isEmpty) {
+                return null;
+              }
+
+              final doc = newsQuery.docs.first;
+              return BeritaModel.fromMap(
+                doc.data(),
+                doc['id_berita'] ?? doc.id.hashCode,
+              );
+            }),
+          );
+
+          return newsItems.whereType<BeritaModel>().toList();
+        });
   }
 
   // NOTE: Di Model spesifikasi belum ada array 'likedBy' / List.
