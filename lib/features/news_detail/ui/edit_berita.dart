@@ -42,41 +42,18 @@ class _EditBeritaState extends State<EditBerita> {
   }
 
   Future<void> _showImageUrlDialog() async {
-    final imageUrlEditController = TextEditingController(text: imageUrlController.text);
-
-    await showDialog<void>(
+    final newImageUrl = await showDialog<String>(
       context: context,
       builder: (dialogContext) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          title: const Text('Edit URL Gambar'),
-          content: TextField(
-            controller: imageUrlEditController,
-            decoration: const InputDecoration(
-              hintText: 'Masukkan URL gambar',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Batal'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 76, 175, 80)),
-              onPressed: () {
-                setState(() {
-                  imageUrlController.text = imageUrlEditController.text.trim();
-                });
-                Navigator.of(dialogContext).pop();
-              },
-              child: const Text('Simpan'),
-            ),
-          ],
-        );
+        return _ImageUrlDialog(initialValue: imageUrlController.text);
       },
     );
-    imageUrlEditController.dispose();
+
+    if (newImageUrl != null && mounted) {
+      setState(() {
+        imageUrlController.text = newImageUrl;
+      });
+    }
   }
 
   Future<void> _handleSimpanBerita() async {
@@ -327,6 +304,59 @@ class _EditBeritaState extends State<EditBerita> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ImageUrlDialog extends StatefulWidget {
+  final String initialValue;
+
+  const _ImageUrlDialog({required this.initialValue});
+
+  @override
+  State<_ImageUrlDialog> createState() => _ImageUrlDialogState();
+}
+
+class _ImageUrlDialogState extends State<_ImageUrlDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialValue);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      title: const Text('Edit URL Gambar'),
+      content: TextField(
+        controller: _controller,
+        decoration: const InputDecoration(
+          hintText: 'Masukkan URL gambar',
+          border: OutlineInputBorder(),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Batal'),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 76, 175, 80)),
+          onPressed: () {
+            Navigator.of(context).pop(_controller.text.trim());
+          },
+          child: const Text('Simpan'),
+        ),
+      ],
     );
   }
 }
