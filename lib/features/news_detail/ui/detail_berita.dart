@@ -19,6 +19,7 @@ class DetailBerita extends StatefulWidget {
 }
 
 class _DetailBeritaState extends State<DetailBerita> {
+  late BeritaModel _berita;
   bool isLiked = false;
   bool isSaved = false;
   bool _isLoadingAction = false;
@@ -32,7 +33,19 @@ class _DetailBeritaState extends State<DetailBerita> {
   @override
   void initState() {
     super.initState();
+    _berita = widget.berita;
     _loadInteractionState();
+  }
+
+  Future<void> _refreshBerita() async {
+    final refreshedBerita = await _newsService.getBeritaById(_berita.idBerita);
+    if (!mounted || refreshedBerita == null) {
+      return;
+    }
+
+    setState(() {
+      _berita = refreshedBerita;
+    });
   }
 
   Future<void> _loadInteractionState() async {
@@ -48,11 +61,11 @@ class _DetailBeritaState extends State<DetailBerita> {
 
     final liked = await _newsService.isBeritaLiked(
       user.idUser,
-      widget.berita.idBerita,
+      _berita.idBerita,
     );
     final bookmarked = await _newsService.isBeritaBookmarked(
       user.idUser,
-      widget.berita.idBerita,
+      _berita.idBerita,
     );
 
     if (!mounted) return;
@@ -94,17 +107,21 @@ class _DetailBeritaState extends State<DetailBerita> {
 
   Future<void> _handleMoreAction(String action) async {
     if (action == 'edit') {
-      Navigator.push(
+      final result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => EditBerita(berita: widget.berita),
+          builder: (context) => EditBerita(berita: _berita),
         ),
       );
+
+      if (result == true) {
+        await _refreshBerita();
+      }
     } else if (action == 'hapus') {
       await handleHapusBeritaWithAlert(
         context,
         onDelete: () async {
-          await _newsService.deleteBerita(widget.berita.idBerita);
+          await _newsService.deleteBerita(_berita.idBerita);
         },
       );
     }
@@ -120,7 +137,7 @@ class _DetailBeritaState extends State<DetailBerita> {
     try {
       await _newsService.toggleLikeBerita(
         _currentUser!.idUser,
-        widget.berita.idBerita,
+        _berita.idBerita,
       );
       if (!mounted) return;
       setState(() {
@@ -145,7 +162,7 @@ class _DetailBeritaState extends State<DetailBerita> {
     try {
       await _newsService.toggleBookmarkBerita(
         _currentUser!.idUser,
-        widget.berita.idBerita,
+        _berita.idBerita,
       );
       if (!mounted) return;
       setState(() {
@@ -158,6 +175,23 @@ class _DetailBeritaState extends State<DetailBerita> {
         });
       }
     }
+  }
+
+  String _sanitizeIsi(String s) {
+    if (s.isEmpty) return s;
+    // Normalize newlines
+    var t = s.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
+    // Remove HTML tags
+    t = t.replaceAll(RegExp(r'<[^>]*>'), ' ');
+    // Replace non-breaking spaces
+    t = t.replaceAll('&nbsp;', ' ').replaceAll('\u00A0', ' ');
+    // Collapse multiple newlines into one
+    t = t.replaceAll(RegExp(r'\n{2,}'), '\n');
+    // Collapse multiple spaces/tabs
+    t = t.replaceAll(RegExp(r'[ \t]{2,}'), ' ');
+    // Trim
+    t = t.trim();
+    return t;
   }
 
   String _formatDate(DateTime dateTime) {
@@ -215,7 +249,7 @@ class _DetailBeritaState extends State<DetailBerita> {
           children: [
             const SizedBox(height: 10),
             Text(
-              widget.berita.judul,
+              _berita.judul,
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -228,7 +262,7 @@ class _DetailBeritaState extends State<DetailBerita> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  _formatDate(widget.berita.createdAt.toDate()),
+                  _formatDate(_berita.createdAt.toDate()),
                   style: const TextStyle(fontSize: 12, color: Colors.black87),
                 ),
                 Row(
@@ -325,7 +359,7 @@ class _DetailBeritaState extends State<DetailBerita> {
             const SizedBox(height: 15),
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: widget.berita.imgUrl.isEmpty
+                child: _berita.imgUrl.isEmpty
                   ? Image.asset(
                       'assets/img/download.jpg',
                       width: double.infinity,
@@ -333,7 +367,7 @@ class _DetailBeritaState extends State<DetailBerita> {
                       fit: BoxFit.cover,
                     )
                   : Image.network(
-                      widget.berita.imgUrl,
+                      _berita.imgUrl,
                       width: double.infinity,
                       height: 220,
                       fit: BoxFit.cover,
@@ -347,16 +381,16 @@ class _DetailBeritaState extends State<DetailBerita> {
                       },
                     ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 6),
             Text(
-              widget.berita.namaAdmin.isEmpty
+              _berita.namaAdmin.isEmpty
                   ? 'Di upload oleh admin'
-                  : 'Di upload oleh ${widget.berita.namaAdmin} (ID: ${widget.berita.idUserAdmin})',
+                  : 'Di upload oleh ${_berita.namaAdmin} (ID: ${_berita.idUserAdmin})',
               style: const TextStyle(fontSize: 12, color: Colors.black87),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 8),
             Text(
-              widget.berita.isiKonten,
+              _sanitizeIsi(_berita.isiKonten),
               textAlign: TextAlign.justify,
               style: const TextStyle(
                 fontSize: 16,
@@ -365,7 +399,7 @@ class _DetailBeritaState extends State<DetailBerita> {
                 letterSpacing: 0.5,
               ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 10),
           ],
         ),
       ),
