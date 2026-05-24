@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:banuainsight_project/features/home_page/ui/home_page.dart';
-import 'package:banuainsight_project/features/home_page/ui/home_page_user.dart';
+import 'package:banuainsight_project/features/user/home_page_user.dart';
 import 'package:banuainsight_project/features/login/register_page.dart';
 import 'package:banuainsight_project/data/services/auth_service.dart';
 
@@ -212,7 +212,7 @@ class _LoginPageState extends State<LoginPage>
                   borderRadius: BorderRadius.circular(18),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.18),
+                      color: Colors.black.withValues(alpha: 0.18),
                       blurRadius: 18,
                       offset: const Offset(0, 8),
                     ),
@@ -272,6 +272,9 @@ class _LoginPageState extends State<LoginPage>
                       scale: _logoScale,
                       child: Hero(
                         tag: 'logo_image',
+                        createRectTween: (begin, end) {
+                          return RectTween(begin: begin, end: end);
+                        },
                         child: Image.asset(
                           'assets/img/Logo_banua.png',
                           height: 260,

@@ -19,6 +19,28 @@ class _EditBeritaState extends State<EditBerita> {
   final NewsService _newsService = NewsService();
   bool _isSaving = false;
 
+  Widget _buildGreenButton({
+    required String label,
+    required IconData icon,
+    required VoidCallback? onPressed,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      height: 34,
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, size: 18),
+        label: Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color.fromARGB(255, 79, 152, 43),
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          elevation: 4,
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -77,16 +99,44 @@ class _EditBeritaState extends State<EditBerita> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Berita berhasil disimpan')),
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.check_circle, color: Color(0xFF2E7D32), size: 60),
+              SizedBox(height: 12),
+              Text(
+                'Berita berhasil disimpan',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+              ),
+            ],
+          ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 76, 175, 80),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
       );
-
-      // Tunggu frame rendering selesai sebelum pop
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          Navigator.pop(context, true);
-        }
-      });
     } catch (error) {
       if (!mounted) return;
 
@@ -255,50 +305,16 @@ class _EditBeritaState extends State<EditBerita> {
               ),
             ),
             const SizedBox(height: 28),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _handleEditGambar,
-                icon: const Icon(Icons.image),
-                label: const Text('Edit Gambar'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 76, 175, 80),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
+            _buildGreenButton(
+              label: 'Edit Gambar',
+              icon: Icons.photo_camera_outlined,
+              onPressed: _handleEditGambar,
             ),
             const SizedBox(height: 12),
-
-            // Tombol Simpan
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _isSaving ? null : _handleSimpanBerita,
-                icon: _isSaving
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                    : const Icon(Icons.check),
-                label: Text(_isSaving ? 'Menyimpan...' : 'Simpan Berita'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 76, 175, 80),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
+            _buildGreenButton(
+              label: _isSaving ? 'Menyimpan...' : 'Simpan Berita',
+              icon: Icons.cloud_upload_outlined,
+              onPressed: _isSaving ? null : _handleSimpanBerita,
             ),
             const SizedBox(height: 40),
           ],
