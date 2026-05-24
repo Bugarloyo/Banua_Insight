@@ -39,8 +39,14 @@ class _SplashScreenState extends State<SplashScreen> {
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 600),
-          pageBuilder: (_, __, ___) => const LoginPage(),
-          transitionsBuilder: (_, animation, __, child) {
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              const LoginPage(),
+          transitionsBuilder: (
+            context,
+            animation,
+            secondaryAnimation,
+            child,
+          ) {
             return FadeTransition(opacity: animation, child: child);
           },
         ),
@@ -100,6 +106,9 @@ class _SplashScreenState extends State<SplashScreen> {
                 // Logo Image animasi skala
                 Hero(
                   tag: 'logo_image',
+                  createRectTween: (begin, end) {
+                    return RectTween(begin: begin, end: end);
+                  },
                   child: AnimatedScale(
                     scale: logoScale,
                     duration: const Duration(milliseconds: 1200),

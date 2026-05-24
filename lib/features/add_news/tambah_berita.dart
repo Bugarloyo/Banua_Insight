@@ -3,6 +3,7 @@ import 'package:banuainsight_project/data/services/auth_service.dart';
 import 'package:banuainsight_project/data/models/user_model.dart';
 import 'package:banuainsight_project/features/search_news/cari_berita.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'dart:convert';
 
@@ -11,6 +12,62 @@ class TambahBerita extends StatefulWidget {
 
   @override
   State<TambahBerita> createState() => _TambahBeritaState();
+}
+
+class _ImageUrlDialog extends StatefulWidget {
+  final String initialValue;
+
+  const _ImageUrlDialog({required this.initialValue});
+
+  @override
+  State<_ImageUrlDialog> createState() => _ImageUrlDialogState();
+}
+
+class _ImageUrlDialogState extends State<_ImageUrlDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialValue);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      title: const Text('Upload Gambar'),
+      content: TextField(
+        controller: _controller,
+        decoration: const InputDecoration(
+          hintText: 'Masukkan URL gambar',
+          border: OutlineInputBorder(),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Batal'),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color.fromARGB(255, 79, 152, 43),
+            foregroundColor: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.of(context).pop(_controller.text.trim());
+          },
+          child: const Text('Simpan'),
+        ),
+      ],
+    );
+  }
 }
 
 class _TambahBeritaState extends State<TambahBerita> {
@@ -139,49 +196,16 @@ class _TambahBeritaState extends State<TambahBerita> {
   }
 
   Future<void> _showImageUrlDialog() async {
-    final imageUrlController = TextEditingController(
-      text: _imgUrlController.text,
-    );
-
-    await showDialog<void>(
+    final String? newUrl = await showDialog<String>(
       context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          title: const Text('Upload Gambar'),
-          content: TextField(
-            controller: imageUrlController,
-            decoration: const InputDecoration(
-              hintText: 'Masukkan URL gambar',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Batal'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 79, 152, 43),
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () {
-                setState(() {
-                  _imgUrlController.text = imageUrlController.text.trim();
-                });
-                Navigator.of(dialogContext).pop();
-              },
-              child: const Text('Simpan'),
-            ),
-          ],
-        );
-      },
+      builder: (dialogContext) => _ImageUrlDialog(initialValue: _imgUrlController.text),
     );
 
-    imageUrlController.dispose();
+    if (newUrl != null && mounted) {
+      setState(() {
+        _imgUrlController.text = newUrl;
+      });
+    }
   }
 
   Widget _buildTextInput({
@@ -317,10 +341,15 @@ class _TambahBeritaState extends State<TambahBerita> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 42, 125, 210),
+        backgroundColor: Colors.white,
         elevation: 0,
-        toolbarHeight: 4,
+        toolbarHeight: 0,
         automaticallyImplyLeading: false,
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.white,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
@@ -330,7 +359,7 @@ class _TambahBeritaState extends State<TambahBerita> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Isi Judul',
+                'Judul Berita',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
@@ -360,6 +389,53 @@ class _TambahBeritaState extends State<TambahBerita> {
                 maxLines: 4,
               ),
               const SizedBox(height: 34),
+              // Show image preview only when an image URL is provided
+              if (_imgUrlController.text.trim().isNotEmpty) ...[
+                const Text(
+                  'Gambar Berita',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    width: double.infinity,
+                    height: 180,
+                    color: Colors.grey[300],
+                    child: Image.network(
+                      _imgUrlController.text.trim(),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.image_not_supported,
+                                size: 48,
+                                color: Colors.grey[600],
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Gambar tidak tersedia',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+              ],
               _buildGreenButton(
                 label: 'Upload Gambar',
                 icon: Icons.photo_camera_outlined,
