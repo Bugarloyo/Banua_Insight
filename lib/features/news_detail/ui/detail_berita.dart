@@ -385,7 +385,7 @@ class _DetailBeritaState extends State<DetailBerita> {
             Text(
               _berita.namaAdmin.isEmpty
                   ? 'Di upload oleh admin'
-                  : 'Di upload oleh ${_berita.namaAdmin} (ID: ${_berita.idUserAdmin})',
+                  : 'Di upload oleh ${_berita.namaAdmin}',
               style: const TextStyle(fontSize: 12, color: Colors.black87),
             ),
             const SizedBox(height: 8),
